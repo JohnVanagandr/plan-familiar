@@ -1,16 +1,48 @@
-# React + Vite
+## Reglas de Contribución y Flujo de Trabajo (Git Flow)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Para garantizar la calidad, el orden y la escalabilidad del proyecto, es **obligatorio** adherirse a las siguientes políticas. **Está estrictamente prohibido solicitar un Pull Request (PR) sin la documentación correspondiente.**
 
-Currently, two official plugins are available:
+### 1. Nomenclatura Estricta de Ramas
+Todo cambio debe desarrollarse y subirse a su respectiva rama respetando la nomenclatura definida. No se permite el desarrollo directo sobre las ramas principales.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+*   **`main`**: Rama de producción o código estable (Bloqueada para commits directos).
+*   **`develop`**: Rama de integración y desarrollo principal.
+*   **`feat/`** o **`feature/`**: Para desarrollo de nuevas funcionalidades (ej. `feat/plan-workspace`).
+*   **`fix/`**: Para la solución de errores o bugs (ej. `fix/sidebar-routing`).
+*   **`refactor/`**: Para reestructuración y mejora de código existente sin alterar su comportamiento final (ej. `refactor/login-schemas`).
+*   **`docs/`**: Para creación o actualización exclusiva de documentación (ej. `docs/api-endpoints`).
+*   **`style/`**: Para ajustes de UI, diseño, formateo de código o linting (ej. `style/button-variants`).
 
-## React Compiler
+### 2. Convención de Commits (Conventional Commits)
+Debemos mantener un historial limpio y predecible. Todos los mensajes de commit deben seguir el estándar basado en el propósito exacto del cambio:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+*   **`feat:`** (Nueva funcionalidad o característica).
+*   **`fix:`** (Solución de un error).
+*   **`docs:`** (Cambios únicamente en la documentación).
+*   **`style:`** (Cambios de formato, espacios, CSS, que no afectan la lógica del código).
+*   **`refactor:`** (Refactorización de código sin añadir funcionalidades ni arreglar bugs).
+*   **`test:`** (Adición o corrección de pruebas).
+*   **`chore:`** (Actualización de dependencias, configuración de herramientas, mantenimiento).
 
-## Expanding the Oxlint configuration
+> **Ejemplo de commit válido:** `feat(plans): integrar formulario de datos principales al workspace`
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+### 3. Políticas Inquebrantables de Pull Requests (PR)
+1.  **Documentación Obligatoria:** Un PR sin descripción detallada será rechazado. Todo PR debe estar documentado explicando el "qué" y el "por qué", y debe reflejar fielmente la suma de los commits que contiene.
+2.  **Responsabilidad Única:** Todo cambio se debe subir a su respectiva rama bajo la nomenclatura correspondiente. No mezcles la solución de un bug (`fix`) con una nueva funcionalidad (`feat`) en el mismo PR.
+3.  **Verificación Previa:** Antes de abrir el PR, el código debe compilar correctamente en local y no romper flujos existentes.
+
+---
+
+### Pasos para iniciar una contribución:
+
+1. Asegúrate de estar en `develop` y tener la última versión sincronizada:
+   ```bash
+   git checkout develop
+   git pull origin develop
+   ```
+2. Crea tu rama respetando la nomenclatura según el tipo de tarea:
+   ```bash
+   git checkout -b feat/nombre-de-tu-funcionalidad
+   ```
+3. Realiza tus cambios y haz tus commits siguiendo la convención (feat:, fix:, style:, etc.).
+4. Sube la rama al repositorio remoto y abre tu Pull Request adjuntando la documentación requerida.
