@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/auth.service';
-import { registerSchema } from '../schemas/auth.schema';
+import { registerSchema } from '../schemas';
 
 export const useRegister = () => {
   const [loading, setLoading] = useState(false);
