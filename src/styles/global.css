@@ -1,0 +1,49 @@
+/* Importación nativa de Tailwind v4 */
+@import "tailwindcss";
+
+/* Mapeo para clases de Tailwind */
+@theme {
+  --color-naranja: #FF6600;
+  --color-azul: #0770CC;
+  --color-gris: #e5e4e7;
+}
+
+/* Variables globales basadas en la identidad visual de la Defensa Civil */
+:root {
+  --radius-base: 12px;
+
+  /* Colores principales */
+  --color_naranja: #FF6600; /* Color de acento / Botones de acción (CTA) */
+  --color_azul: #0770CC;    /* Color institucional / Estructura */
+
+  /* Colores complementarios */
+  --color_blanco: #fff;
+  --color_gris: #e5e4e7;
+  --color_rojo: rgb(197, 0, 0);
+  --color_verde: rgb(13, 182, 13);
+  --color_amarillo: rgb(255, 170, 0);
+
+  --shadow: rgba(0, 0, 0, 0.08) 0 10px 25px -3px, rgba(0, 0, 0, 0.04) 0 4px 6px -2px;
+
+  /* Degradados institucionales (extraídos del fondo del diseño) */
+  --gra_amanecer: linear-gradient(180deg, #80c6ff 0%, rgba(235, 248, 255, 1) 100%);
+  --gra_azul_fondo: #7bc0ff; 
+}
+
+body {
+  @apply text-slate-900;
+  /* Fondo general basado en el tono celeste de la plantilla */
+  background-color: var(--gra_azul_fondo);
+  background-image: linear-gradient(180deg, #6bb3ff 0%, #9ad4ff 100%);
+  background-attachment: fixed;
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
