@@ -20,6 +20,7 @@
   --blue-gra: linear-gradient(180deg, rgba(235, 248, 255, 0) 0%, #80c6ff 100%);
   --blue-gra-t: linear-gradient(0deg, rgba(235, 248, 255, 0) 0%, #80c6ff 100%);
   --blue-gra-r: linear-gradient(90deg, rgba(235, 248, 255, 0) 0%, #0770CC 100%);
+  --blue-gra-d: linear-gradient(115deg, rgba(235, 248, 255, 0) 20%, #0770cc79 80%);
   --white-gra: linear-gradient(0deg,   rgba(235, 248, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
   --white-gra-b: linear-gradient(180deg,   rgba(235, 248, 255, 0) 0%, rgba(255, 255, 255, 0.781) 100%);
   --white-gra-l: linear-gradient(270deg, rgba(235, 248, 255, 0) 0%, rgba(255, 255, 255, 0.781) 100%);
@@ -41,10 +42,10 @@
 
 body {
   @apply text-slate-900;
-  /* Fondo general basado en el tono celeste de la plantilla */
-  /* background-color: var(--gra_azul_fondo); */
-  background-image: linear-gradient(180deg, #6bb3ff 0%, #9ad4ff 100%);
-  background-attachment: fixed;
+  position: relative;
+  background: linear-gradient(200deg, #54a7ff 0%, #b8e0ff 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease alternate infinite;
   margin: 0;
   font-family: system-ui, -apple-system, sans-serif;
   min-height: 100vh;
@@ -52,6 +53,7 @@ body {
 
 #root {
   min-height: 100vh;
+  min-width: 400px;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -68,4 +70,10 @@ body {
       transform: translateY(-15px);
     }
   }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
