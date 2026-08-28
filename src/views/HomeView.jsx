@@ -1,43 +1,99 @@
-import { Link, Card, Badge } from '../components/ui';
+import { Link, Card, Button, Badge } from '../components/ui';
 import { ShieldCheck, Users, Settings, ArrowRight } from 'lucide-react';
 
 export const HomeView = () => {
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col items-center justify-between">
       
-      {/* SECCIÓN HERO */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#0770CC] to-[#055194] text-white py-24 px-6 sm:px-12 flex items-center justify-center">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px]"></div>
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10 space-y-6">
-          <Badge variant="glass" size="md">
-            Defensa Civil Colombiana
-          </Badge>
-          
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight">
-            Plan Familiar de <span className="text-[#FF6600]">Emergencia</span>
-          </h1>
-          
-          <p className="text-lg sm:text-xl text-blue-100 max-w-2xl mx-auto font-normal leading-relaxed">
-            Es una herramienta preventiva esencial para organizar a familias ante riesgos, fortaleciendo la capacidad de respuesta y la cultura de prevención comunitaria.
-          </p>
+      <div className="w-full max-w-[1500px] px-10">
 
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-            
-            <Link href="/login" variant="accent" size="lg" className="w-full sm:w-auto min-w-[180px]">
-              Iniciar Sesión
-            </Link>
-            
-            <Link href="/register" variant="glass" size="lg" className="w-full sm:w-auto min-w-[180px]">
-              Registrarse
-            </Link>
+        {/* SECCIÓN HERO */}
+        <section className="w-full h-[600px] bg-(image:--blue-gra-r) rounded-4xl flex p-8 items-center justify-between relative mb-25">
 
-          </div>
-        </div>
-      </section>
+                <div className="flex flex-col items-start relative">
 
-      {/* SECCIÓN DE CUALIDADES */}
-      <section className="py-24 px-6 sm:px-12 bg-slate-50/60 flex-1">
+                    <i className="ri-road-map-fill text-[400px] absolute -right-40 opacity-20 rotate-12"></i>
+
+                    <img src="/svg/ilustracion_ave_a.svg" alt="" className="size-20 absolute -top-15 -left-10 z-50 animate-float"/>
+
+                    <span className="text-4xl text-(--color_azul) font-bold w-full flex items-center text-nowrap gap-5 z-50">
+                        Defensa Civil Colombiana
+
+                        <div className="w-full flex gap-4">
+                            <div className="min-w-1.5 min-h-1.5 bg-(--color_naranja) rounded-full"/>
+                            <div className="min-w-1.5 min-h-1.5 bg-(--color_naranja) rounded-full"/>
+                            <div className="min-w-1.5 min-h-1.5 bg-(--color_naranja) rounded-full"/>
+                            <div className="w-full h-1.5 bg-(--color_naranja) rounded-full"/>
+                            <div className="w-full h-1.5 bg-(--color_naranja) rounded-full"/>
+                            <div className="w-full h-1.5 bg-(--color_naranja) rounded-full"/>
+                            <div className="min-w-1.5 min-h-1.5 bg-(--color_naranja) rounded-full"/>
+                            <div className="min-w-1.5 min-h-1.5 bg-(--color_naranja) rounded-full"/>
+                            <div className="min-w-1.5 min-h-1.5 bg-(--color_naranja) rounded-full"/>
+                        </div>
+
+                    </span>
+
+                    <h1 className="text-5xl font-bold text-left text-white z-50 text-nowrap">
+                        PLAN FAMILIAR DE EMERGENCIA
+                    </h1>
+
+                    <div className="pt-10 flex gap-4">
+                      <Button variant="accent" fullWidth>
+                          Iniciar sesión
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                      <Button variant="primary" fullWidth>
+                          Registrarse
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+
+                </div>
+
+                <img src="/svg/ilustracion_voluntarios_b.svg" alt="" className="h-160 z-50 translate-y-10"/>
+ 
+                <div className="size-20 rounded-full bg-(image:--white-gra) absolute -bottom-3 -left-3 animate-float"/>
+                <div className="size-10 rounded-full bg-(image:--white-gra) absolute bottom-10 left-20 animate-float"/>
+                <div className="size-120 rounded-full bg-(image:--white-gra) absolute -top-70 -right-20"/>
+                <div className="size-15 rounded-full bg-(image:--white-gra) absolute -top-30 right-110 animate-float"/>
+
+                <img src="/svg/ilustracion_ave_b.svg" alt="" className="size-30 absolute -top-12 -right-10 z-50 animate-float"/>
+        </section>
+
+        {/* SECCIÓN presentacion */}
+        <section className="w-full flex items-center gap-15 relative mb-28">
+                
+                <div className="size-100 min-w-100 overflow-hidden rounded-full z-50">
+                    <img src="image/img_voluntario.jpg" alt="" className="size-full object-cover transition-transform duration-300 hover:scale-105"/>
+                </div>
+
+                <div className="size-100 rounded-full bg-(image:--white-gra) absolute top-10 left-10"/>
+                <div className="size-20 rounded-full bg-(image:--white-gra) absolute top-2 left-5 z-60 animate-float"/>
+                <div className="size-10 rounded-full bg-(image:--white-gra) absolute -bottom-20 -right-5 z-60 animate-float"/>
+                <div className="size-30 rounded-full bg-(image:--white-gra) absolute -bottom-20 right-4 z-60 animate-float"/>
+
+                <div className="w-full flex flex-col gap-7 items-center relative">
+
+                    <i className="ri-file-unknow-fill absolute text-9xl right-70 -top-10 opacity-50"></i>
+
+                    <h1 className="w-full text-start text-5xl font-bold z-50">
+                        ¿Qué es el aplicativo de <br /> Plan Familiar de Emergencia?
+                    </h1>
+                    
+                    <p className="text-start text-(--blue) text-xl">
+                        El Plan Familiar de Emergencia es una guía de organización para el hogar, diseñada para prevenir, reducir y responder de forma ordenada ante un desastre o situación de peligro.
+
+                        A través de él, cada miembro de la familia conoce sus tareas específicas, las rutas de salida y los puntos de encuentro establecidos. <br /> <br />
+
+                        Este aplicativo digitaliza y amplifica ese proceso, haciéndolo más accesible y fácil de mantener actualizado.
+                    </p>
+                    
+                </div>
+
+        </section>
+
+        {/* SECCIÓN DE CUALIDADES */}
+        <section className="py-24 px-6 sm:px-12 flex-1">
         <div className="max-w-6xl mx-auto">
           
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
@@ -116,10 +172,12 @@ export const HomeView = () => {
 
           </div>
         </div>
-      </section>
+        </section>
+
+      </div>
 
       {/* SECCIÓN INFERIOR */}
-      <section className="bg-white border-t border-slate-200/80 py-20 px-6 text-center">
+      <section className="w-full bg-white border-t border-slate-200/80 py-20 px-6 text-center">
         <div className="max-w-3xl mx-auto space-y-6">
           <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">¿Listo para proteger a los tuyos?</h3>
           <p className="text-slate-600 text-base max-w-xl mx-auto">

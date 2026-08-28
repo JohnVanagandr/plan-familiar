@@ -114,8 +114,8 @@ export const DashboardView = () => {
           </div>
           
           <div className="space-y-3">
-            <Button variant="primary" fullWidth>
-              Actualizar Datos del Hogar
+            <Button variant="secondary" fullWidth>
+              Iniciar sesión
               <ArrowRight className="w-4 h-4" />
             </Button>
             
