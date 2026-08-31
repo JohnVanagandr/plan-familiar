@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { loginSchema } from "@/features/auth/schemas/auth.schema.js";
 import { registerSchema } from "@/features/auth/schemas/register.schema.js";
-// import { Alert } from "../../components/ui/alerts.jsx";
+import { Alert } from "@/components/ui/alerts.jsx";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useFormValidation } from "@/features/auth/hooks/useFormValidation.js";
 import { Select } from "@/components/ui/select.jsx";
@@ -9,6 +9,7 @@ import { Button, Input, Link } from '@/components/ui';
 import { Lock, UserRound } from "lucide-react";
 
 const initial_state = { correo: "", contrasena: "" };
+
 const initial_state_register = {
   nombre: "",
   apellido: "",
@@ -81,12 +82,12 @@ const LoginRegisterView = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleNavigateWithFade = (targetUrl) => {
+  const handleNavigateWithFade = (navigateUrl) => {
 
     setIsVisible(false);
 
     setTimeout(() => {
-      navigate(targetUrl);
+      navigate(navigateUrl);
     }, 500);
   };
 
@@ -99,8 +100,8 @@ const LoginRegisterView = () => {
       // localStorage.setItem("rol", "supervisor");
       // localStorage.setItem("rol", "administrador");
 
-      setAlertMessage("¡Sesión iniciada con éxito!");
       setShowToast(true);
+      setAlertMessage("¡Sesión iniciada con éxito!");
       resetForm();
       handleNavigateWithFade("/dashboard");
     } else {
@@ -115,6 +116,7 @@ const LoginRegisterView = () => {
       setAlertMessage("¡Usuario registrado con éxito!");
       setShowToast(true);
       resetRegisterForm();
+      navigate("/login");
     } else {
       console.warn("Errores de validación:", registerErrors);
     }
@@ -186,7 +188,7 @@ const LoginRegisterView = () => {
               error={errors.contrasena}
             />
 
-            <Button type="submit" variant="primary" size="lg" onClick={() => handleNavigateWithFade("/login")}>
+            <Button type="submit" variant="primary" size="lg">
               Iniciar sesión
             </Button>
 
@@ -388,13 +390,13 @@ const LoginRegisterView = () => {
         </div>
       </div>
 
-      {/* <Alert
+      <Alert
         variant="success"
         icon="ri-checkbox-circle-fill"
         text={alertMessage}
         isVisible={showToast}
         onClose={() => setShowToast(false)}
-      /> */}
+      />
     </div>
   );
 }
