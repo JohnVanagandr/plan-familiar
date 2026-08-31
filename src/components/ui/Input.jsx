@@ -1,5 +1,5 @@
 import { useId, useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { CircleAlert, Eye, EyeOff } from 'lucide-react';
 
 export const Input = ({
   label,
@@ -79,7 +79,8 @@ export const Input = ({
       </div>
 
       {error && (
-        <span id={`${inputId}-error`} className="text-xs text-red-500 font-medium ml-0.5 animate-in fade-in slide-in-from-top-1">
+        <span id={`${inputId}-error`} className="text-xs text-red-500 font-medium ml-0.5 animate-in fade-in slide-in-from-top-1 flex gap-2 items-center">
+          <CircleAlert className="size-4 shrink-0"/>
           {error}
         </span>
       )}

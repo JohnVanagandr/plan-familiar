@@ -3,7 +3,7 @@ import { ShieldCheck, Users, Settings, ArrowRight, FileQuestionMark, HeartHandsh
 
 export const HomeView = () => {
   return (
-    <div className="flex-1 flex flex-col items-center justify-between overflow-x-hidden">
+    <div className="flex-1 flex flex-col items-center justify-between">
       <div className="w-full max-w-375 px-3 flex flex-col gap-10 md:gap-10">
 
         {/* SECCIÓN HERO */}
@@ -93,7 +93,7 @@ export const HomeView = () => {
           <div className="w-full flex flex-col gap-5 items-center relative px-2 sm:gap-7 lg:items-start lg:px-0">
             <FileQuestionMark className="hidden absolute size-20 right-10 -top-8 opacity-40 text-(--color_azul) rotate-12 lg:block lg:size-30 lg:right-70 lg:-top-10" />
 
-            <h1 className="w-full text-center text-3xl font-bold z-50 sm:text-4xl lg:text-start lg:text-5xl">
+            <h1 className="w-full text-center text-3xl font-bold z-50 sm:text-4xl lg:text-start lg:text-5xl text-(--color_azul)">
               ¿Qué es el aplicativo de <br /> Plan Familiar de Emergencia?
             </h1>
 
@@ -122,7 +122,7 @@ export const HomeView = () => {
             <div className="text-center max-w-2xl mx-auto mb-12 space-y-3 relative sm:mb-16">
 
               <UsersRound className="hidden absolute size-30 -top-15 right-3.5 text-(--color_azul)/30 lg:block" />
-              <h2 className="text-3xl font-bold tracking-tight z-60 sm:text-4xl md:text-5xl">
+              <h2 className="text-3xl font-bold tracking-tight z-60 sm:text-4xl md:text-5xl text-(--color_azul)">
                 Roles, gestión y control
               </h2>
               <p className="text-slate-600 text-base leading-relaxed sm:text-lg lg:text-xl">
