@@ -27,7 +27,7 @@ export const Button = ({
     "outline-secondary": "border-2 border-slate-200 text-slate-600 bg-transparent hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 hover:-translate-y-0.5 focus-visible:ring-slate-300",
     ghost: "bg-transparent text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 active:bg-slate-200 focus-visible:ring-slate-300",
     glass: "bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20 hover:shadow-lg focus-visible:ring-white",
-    sidebar: "bg-white/10 text-white hover:bg-white/20 border border-white/20 shadow-sm font-medium"
+    sidebar: " bg-(--color_naranja) text-white hover:scale-110 border border-white/20 font-medium"
   };
 
   const sizes = {

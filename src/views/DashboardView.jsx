@@ -1,132 +1,124 @@
-import { Card, Badge, Button, IconBox } from '@/components/ui';
-import { ShieldCheck, Users, AlertTriangle, PhoneCall, ArrowRight, CheckCircle } from 'lucide-react';
+import { Card, Badge, Button, IconBox } from "@/components/ui";
+import {
+  ShieldCheck,
+  Users,
+  AlertTriangle,
+  PhoneCall,
+  ArrowRight,
+  CheckCircle,
+  HouseHeart,
+  UsersRound,
+  Bell,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const DashboardView = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
-      
-      {/* 1. BANNER DE BIENVENIDA */}
-      <div className="bg-gradient-to-r from-[#0770CC] to-[#055194] rounded-3xl p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
-        
-        <div className="relative z-10 space-y-2">
-          <Badge variant="glass" size="sm">Panel de Control Activo</Badge>
-          <h2 className="text-3xl font-extrabold tracking-tight">Bienvenido al Plan Familiar</h2>
-          <p className="text-blue-100 text-sm max-w-xl leading-relaxed">
-            Su núcleo familiar se encuentra registrado. Actualmente el nivel de preparación preventiva se encuentra en un <span className="font-bold text-[#FF6600]">75%</span>.
-          </p>
-        </div>
+    <div className="w-full flex flex-col justify-center gap-4 p-4 bg-(image:--white-gra-l) rounded-4xl sm:p-6 lg:p-10">
+      <div className="flex flex-col gap-1 items-start">
+        <span className="text-sm text-(--color_naranja) sm:text-base">
+          {" "}
+          PANEL DE VOLUNTARIO{" "}
+        </span>
 
-        <div className="relative z-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 flex items-center gap-4">
-          <div className="text-right">
-            <span className="text-xs text-blue-100 block">Estado del Protocolo</span>
-            <span className="text-sm font-bold text-white flex items-center gap-1.5 justify-end">
-              <CheckCircle className="w-4 h-4 text-emerald-400" /> Operativo
-            </span>
-          </div>
-        </div>
+        <h1 className="text-2xl font-bold text-(--color_azul) sm:text-3xl lg:text-4xl">
+          {" "}
+          Nombre del voluntario{" "}
+        </h1>
+
+        <span className="text-sm text-(--color_azul) sm:text-base">
+          <i class="ri-map-pin-2-fill"></i> Seccional · Voluntario activo
+        </span>
+
+        <div className="w-full max-w-xl h-1 bg-white rounded-full"></div>
       </div>
 
-      {/* 2. TARJETAS DE MÉTRICAS (GRID) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        
-        <Card variant="default" padding="sm">
-          <div className="flex items-center justify-between mb-4">
-            {/* ✨ Consumo Limpio de IconBox */}
-            <IconBox icon={Users} variant="primary" size="md" />
-            <Badge variant="primary" size="xs">Hogar</Badge>
-          </div>
-          <h3 className="text-2xl font-black text-slate-900">4 Miembros</h3>
-          <p className="text-xs text-slate-500 mt-1">Roles y perfiles asignados</p>
-        </Card>
+      {/* En mobile/tablet: apilado en columna. Desde lg: lado a lado como el original. */}
+      <div className="flex flex-col gap-4 lg:flex-row lg:h-150">
+        {/* Panel presentación y opciones */}
 
-        <Card variant="default" padding="sm">
-          <div className="flex items-center justify-between mb-4">
-            {/* ✨ Consumo Limpio de IconBox */}
-            <IconBox icon={AlertTriangle} variant="accent" size="md" />
-            <Badge variant="accent" size="xs">Zona</Badge>
-          </div>
-          <h3 className="text-2xl font-black text-slate-900">2 Riesgos</h3>
-          <p className="text-xs text-slate-500 mt-1">Identificados y evaluados</p>
-        </Card>
+        <div className="w-full flex flex-col justify-between gap-4 lg:gap-0">
+          <div className="relative w-full h-fit min-h-100 min-w-0 bg-(image:--blue-gra-r) px-5 py-5 rounded-4xl flex flex-col gap-6 justify-between sm:px-7 lg:h-135 lg:min-w-87.5">
 
-        <Card variant="default" padding="sm">
-          <div className="flex items-center justify-between mb-4">
-            {/* ✨ Consumo Limpio de IconBox */}
-            <IconBox icon={ShieldCheck} variant="success" size="md" />
-            <Badge variant="success" size="xs">Seguridad</Badge>
-          </div>
-          <h3 className="text-2xl font-black text-slate-900">Mochila Lista</h3>
-          <p className="text-xs text-slate-500 mt-1">Kit de emergencia verificado</p>
-        </Card>
+            <img
+              src="../../public/svg/ilustracion_ave_b.svg"
+              alt=""
+              className="absolute w-16 top-5 right-5 sm:w-25"
+            />
 
-        <Card variant="default" padding="sm">
-          <div className="flex items-center justify-between mb-4">
-            {/* ✨ Consumo Limpio de IconBox con variante purpura integrada */}
-            <IconBox icon={PhoneCall} variant="purple" size="md" />
-            <Badge variant="neutral" size="xs">Enlaces</Badge>
-          </div>
-          <h3 className="text-2xl font-black text-slate-900">5 Contactos</h3>
-          <p className="text-xs text-slate-500 mt-1">Líneas de emergencia guardadas</p>
-        </Card>
+            <div className="flex flex-col items-center gap-5 justify-between">
+              <div className="flex flex-col items-center gap-4">
+                <span className="text-base text-white font-bold text-center sm:text-xl">
+                  Total Planes Familiares Realizados
+                </span>
 
-      </div>
-
-      {/* 3. SECCIÓN INFERIOR: PUNTOS CRÍTICOS Y ACCIONES */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Puntos críticos del plan */}
-        <Card variant="default" padding="md" className="lg:col-span-2">
-          <h3 className="text-xl font-bold text-slate-900 mb-6">Puntos Críticos del Plan Familiar</h3>
-          
-          <div className="space-y-4">
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                {/* ✨ Consumo Limpio de IconBox (usado para texto/número) */}
-                <IconBox variant="primary" size="sm" className="text-sm">1</IconBox>
-                <div>
-                  <h4 className="font-bold text-slate-900 text-sm">Definición de Punto de Encuentro</h4>
-                  <p className="text-xs text-slate-500">Parque central del barrio - Zona segura asignada.</p>
+                <div className="flex flex-col gap-5 items-center justify-between sm:gap-7">
+                  <h1 className="text-3xl text-white font-bold flex items-center gap-2 sm:text-5xl">
+                      <UsersRound className="size-7 sm:size-10"/> 12
+                  </h1>
+                  <div className="flex flex-wrap gap-2 justify-center sm:gap-4">
+                    <p className="py-1.5 px-4 rounded-full bg-red-700 flex gap-2 text-nowrap text-white text-sm sm:px-5 sm:text-base">
+                      <HouseHeart className="size-5 shrink-0" /> 7 Vulnerables
+                    </p>
+                    <p className="py-1.5 px-4 rounded-full bg-green-700 flex gap-2 text-nowrap text-white text-sm sm:px-5 sm:text-base">
+                      <HouseHeart className="size-5 shrink-0" /> 5 No vulnerables
+                    </p>
+                  </div>
                 </div>
               </div>
-              <Badge variant="success" size="sm">Completado</Badge>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                {/* ✨ Consumo Limpio de IconBox (usado para texto/número) */}
-                <IconBox variant="accent" size="sm" className="text-sm">2</IconBox>
-                <div>
-                  <h4 className="font-bold text-slate-900 text-sm">Asignación de Roles ante Evacuación</h4>
-                  <p className="text-xs text-slate-500">Revisión de botiquín y corte de suministros.</p>
-                </div>
-              </div>
-              <Badge variant="accent" size="sm">Pendiente</Badge>
+            <div className="w-full flex justify-center relative">
+              <div className="hidden size-15 rounded-full bg-(image:--white-gra) absolute top-1 right-1 z-60 animate-float sm:block" />
+              <div className="hidden size-10 rounded-full bg-(image:--white-gra) absolute top-40 left-10 z-60 animate-float md:block" />
+              <div className="hidden size-5 rounded-full bg-(image:--white-gra) absolute top-30 left-5 z-60 animate-float md:block" />
+
+              <img
+                src="../../public/svg/ilustracion_familia_c.svg"
+                alt=""
+                className="w-56 translate-y-5 sm:w-72 lg:w-90"
+              />
             </div>
           </div>
-        </Card>
 
-        {/* Acciones rápidas de gestión */}
-        <Card variant="default" padding="md" className="flex flex-col justify-between">
-          <div>
-            <h3 className="text-xl font-bold text-slate-900 mb-4">Acciones Rápidas</h3>
-            <p className="text-slate-500 text-sm mb-6">Herramientas de gestión inmediata para simulacros y emergencias reales.</p>
-          </div>
-          
-          <div className="space-y-3">
-            <Button variant="primary" fullWidth>
-              Actualizar Datos del Hogar
-              <ArrowRight className="w-4 h-4" />
+          <div className="w-full flex gap-3 justify-center relative sm:gap-4">
+            <Button
+              onClick={() => navigate("/dashboard/plans")}
+            >
+              Planes Familiares
             </Button>
-            
-            <Button variant="secondary" fullWidth>
-              Descargar Protocolo PDF
-            </Button>
-          </div>
-        </Card>
 
+            <Button>
+              Crear nuevo plan
+            </Button>
+
+            {/* Circulos decorativos: menos cantidad y más chicos en mobile, todos visibles desde lg */}
+            <div className="hidden size-10 bg-(--color_naranja) rounded-full base:block"/>
+            <div className="hidden size-10 bg-(--color_naranja) rounded-full 2xl:block"/>
+            <div className="hidden size-10 bg-(--color_naranja) rounded-full xl:block"/>
+            <div className="hidden size-10 bg-(--color_naranja) rounded-full xl:block"/>
+            <div className="hidden size-10 bg-(--color_naranja) rounded-full xl:block"/>
+
+          </div>
+        </div>
+
+        {/* Notificaciones: se oculta en mobile/tablet, aparece desde lg como panel lateral */}
+        <div className="hidden h-full w-full max-w-80 bg-white px-7 py-5 rounded-4xl flex-col gap-6 justify-between lg:flex">
+          <div className="w-full">
+            <h1 className="text-(--color_azul) text-xl w-full flex justify-between items-center">
+              <Bell/> Notificaciones recientes
+            </h1>
+          </div>
+
+          <div className="flex flex-col items-center justify-center gap-4 px-4 h-full">
+            <span> No hay notificaciones recientes </span>
+
+            <Button> Ver más </Button>
+          </div>
+        </div>
       </div>
-
     </div>
   );
 };

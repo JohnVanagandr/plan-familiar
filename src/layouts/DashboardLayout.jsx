@@ -13,7 +13,7 @@ export const DashboardLayout = () => {
   }, [location.pathname]);
 
   return (
-    <div className="h-screen flex bg-slate-100 text-slate-900 overflow-hidden relative">
+    <div className="h-screen w-full max-w-350 flex text-slate-900 overflow-hidden relative">
       
       {/* Overlay Oscurecido para Móviles */}
       {isMobileOpen && (
@@ -41,7 +41,7 @@ export const DashboardLayout = () => {
         />
 
         {/* Zona Dinámica de Vistas con Scroll Independiente */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-10 overflow-y-auto bg-slate-50 relative">
+        <main className="flex-1 p-4 sm:p-4 lg:p-10 relative ">
           <Outlet />
         </main>
       </div>
