@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
-// Esquema para el Login
+//Esquema para el login
 export const loginSchema = z.object({
-  email: z
+  correo: z
     .string()
     .min(1, "El correo electrónico es obligatorio.")
     .email("El formato del correo electrónico no es válido."),
-  password: z
+  contrasena: z
     .string()
     .min(1, "La contraseña es obligatoria.")
     .min(6, "La contraseña debe tener al menos 6 caracteres."),

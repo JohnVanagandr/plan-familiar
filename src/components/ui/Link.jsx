@@ -28,6 +28,7 @@ export const Link = ({
     link: "text-[#0770CC] hover:text-[#065da8] font-medium",
     primary: "bg-[#0770CC] text-white border border-transparent shadow-sm shadow-[#0770CC]/20 hover:bg-[#065da8] hover:shadow-md hover:shadow-[#0770CC]/30 hover:-translate-y-0.5 focus-visible:ring-[#0770CC]",
     accent: "bg-[#FF6600] text-white border border-transparent shadow-sm shadow-[#FF6600]/20 hover:bg-[#e05b00] hover:shadow-md hover:shadow-[#FF6600]/30 hover:-translate-y-0.5 focus-visible:ring-[#FF6600]",
+    accent_blue: "bg-[var(--color_azul)] text-white border border-transparent shadow-sm shadow-[var(--color_azul)]/20 hover:bg-[#065da9] hover:shadow-md hover:shadow-[var(--color_azul)]/30 hover:-translate-y-0.5 focus-visible:ring-[var(--color_azul)]",
     secondary: "bg-white text-slate-700 border border-slate-200 shadow-sm hover:border-[#0770CC]/50 hover:text-[#0770CC] hover:bg-slate-50 hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-[#0770CC]",
     ghost: "bg-transparent text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 active:bg-slate-200 focus-visible:ring-slate-300",
     "outline-primary": "border-2 border-[#0770CC] text-[#0770CC] bg-transparent hover:bg-[#0770CC] hover:text-white hover:shadow-sm hover:-translate-y-0.5 focus-visible:ring-[#0770CC]",

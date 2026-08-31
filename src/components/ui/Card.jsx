@@ -12,7 +12,7 @@ export const Card = ({
   const variants = {
     default: "bg-white border border-slate-200 shadow-sm shadow-slate-200/50 hover:shadow-xl hover:shadow-[#0770CC]/10 hover:border-[#0770CC]/30 hover:-translate-y-1",
     
-    editorial: "bg-gradient-to-b from-white to-slate-50/50 border border-slate-200/70 shadow-md shadow-slate-200/50 hover:shadow-2xl hover:shadow-[#0770CC]/10 hover:border-[#0770CC]/40 hover:-translate-y-1.5",
+    editorial: "bg-gradient-to-b from-white to-slate-50/50 hover:shadow-2xl hover:shadow-[#0770CC]/10 hover:border-[#0770CC]/40 hover:-translate-y-1.5",
     
     glass: "bg-white/60 backdrop-blur-xl border border-white/80 shadow-xl shadow-slate-200/40 hover:bg-white/80 hover:-translate-y-1",
     
