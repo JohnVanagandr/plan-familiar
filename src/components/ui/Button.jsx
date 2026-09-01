@@ -20,7 +20,7 @@ export const Button = ({
     primary: "bg-[var(--color_naranja)] text-white border border-transparent shadow-sm shadow-[#FF6600]/20 hover:brightness-110 hover:shadow-md hover:shadow-[#FF6600]/30 hover:-translate-y-0.5 focus-visible:ring-[var(--color_naranja)]",
     secondary: "bg-[var(--color_azul)] text-white border border-transparent shadow-sm shadow-[#0770CC]/20 hover:brightness-110 hover:shadow-md hover:shadow-[#0770CC]/30 hover:-translate-y-0.5 focus-visible:ring-[var(--color_azul)]",
     accent: "bg-[#FF6600] text-white border border-transparent shadow-sm shadow-[#FF6600]/20 hover:bg-[#e05b00] hover:shadow-md hover:shadow-[#FF6600]/30 hover:-translate-y-0.5 focus-visible:ring-[#FF6600]",
-    secondary: "bg-white text-slate-700 border border-slate-200 shadow-sm hover:border-[#0770CC]/50 hover:text-[#0770CC] hover:bg-slate-50 hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-[#0770CC]",
+    third: "bg-white text-slate-700 border border-slate-200 shadow-sm hover:border-[#0770CC]/50 hover:text-[#0770CC] hover:bg-slate-50 hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-[#0770CC]",
     danger: "bg-red-500 text-white border border-transparent shadow-sm shadow-red-500/20 hover:bg-red-600 hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-red-500",
     success: "bg-emerald-500 text-white border border-transparent shadow-sm shadow-emerald-500/20 hover:bg-emerald-600 hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-emerald-500",
     "outline-primary": "border-2 border-[#0770CC] text-[#0770CC] bg-transparent hover:bg-[#0770CC] hover:text-white hover:shadow-sm hover:-translate-y-0.5 focus-visible:ring-[#0770CC]",

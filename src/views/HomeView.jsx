@@ -227,7 +227,7 @@ export const HomeView = () => {
       </div>
 
       {/* SECCIÓN INFERIOR */}
-      <section className="w-full h-fit min-h-fit bg-white border-t border-slate-200/80 py-14 px-5 text-center z-70 sm:px-10 lg:px-20 lg:py-20">
+      <section className="rounded-t-4xl w-full h-fit min-h-fit bg-white border-t border-slate-200/80 py-14 px-5 text-center z-70 sm:px-10 lg:px-20 lg:py-20 text-sm sm:text-base">
 
         <div className="mx-auto flex flex-col gap-12 items-center max-w-350 lg:flex-row lg:justify-between lg:items-end lg:gap-4">
 
@@ -265,19 +265,21 @@ export const HomeView = () => {
             </div>
 
             <div className="w-full flex flex-col items-center gap-1 sm:items-start">
-              <p className="flex items-start text-sm sm:text-base">
-                <span className="font-bold text-nowrap">Correo institucional:</span>&nbsp;orientacionciudadana@defensacivil.gov.co
-              </p>
-              <p className="text-center text-sm sm:text-left sm:text-base">
-                <span className="font-bold text-nowrap">Correo notificaciones judiciales:</span>&nbsp;notificacionesjudiciales@defensacivil.gov.co
-              </p>
+              <div className="flex flex-col text-center sm:text-left">
+                <span className="font-bold">Correo institucional:</span>
+                <p>orientacionciudadana@defensacivil.gov.co</p>
+              </div>
+              <div className="flex flex-col text-center sm:text-left">
+                <span className="font-bold">Correo notificaciones judiciales:</span>
+                <p>notificacionesjudiciales@defensacivil.gov.co</p>
+              </div>
             </div>
 
           </div>
 
           <div className="flex flex-col gap-7 items-center w-full min-w-fit lg:w-auto">
 
-            <h1 className="text-xl font-bold text-center sm:text-2xl">Siguenos en nuestros canales oficiales</h1>
+            <h1 className="text-lg font-bold text-center sm:text-2xl">Siguenos en nuestros canales oficiales</h1>
 
             <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
 

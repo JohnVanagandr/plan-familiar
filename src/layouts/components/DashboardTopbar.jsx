@@ -53,9 +53,9 @@ export const DashboardTopbar = ({ isMobileOpen, setIsMobileOpen }) => {
   );
 
   return (
-    <header className="h-fit p-4 sm:px-6 flex items-center justify-between  sticky top-0 z-20 shrink-0">
+    <header className="h-fit px-0 flex items-center justify-between  sticky top-0 z-20 shrink-0 lg:px-4 lg:pt-4 ">
       
-      <div className='bg-white w-full px-5 py-1.5 rounded-full flex justify-between'>
+      <div className='bg-white w-full px-2 py-2 flex justify-between lg:rounded-full'>
         {/* Sección Izquierda: Menú Móvil y Título */}
         <div className="flex items-center gap-4">
 
@@ -69,6 +69,8 @@ export const DashboardTopbar = ({ isMobileOpen, setIsMobileOpen }) => {
             <Menu className="w-6 h-6" />
           </Button>
 
+          <img src="/logo.png" alt="Logo" className='size-10'/>
+
           <h1 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-500 hidden sm:block">
             Sistema de Gestión Integral
           </h1>
@@ -79,10 +81,10 @@ export const DashboardTopbar = ({ isMobileOpen, setIsMobileOpen }) => {
         <div className="flex items-center gap-4">
 
           <Button
-            variant="secondary"
+            variant="third"
             shape="square"
             size="sm"
-            className="relative p-2!"
+            className="relative p-2! rounded-full!"
           >
             <Bell className="w-5 h-5 text-slate-600" />
             <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-(--color_naranja) border-2 border-white"></span>

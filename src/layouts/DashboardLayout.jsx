@@ -41,7 +41,14 @@ export const DashboardLayout = () => {
         />
 
         {/* Zona Dinámica de Vistas con Scroll Independiente */}
-        <main className="flex-1 p-4 sm:p-4 lg:p-10 relative ">
+        <main className="flex-1 p-4 sm:p-4 lg:p-10 relative overflow-y-auto
+          [&::-webkit-scrollbar]:h-2
+          [&::-webkit-scrollbar]:w-2
+          [&::-webkit-scrollbar-track]:rounded-full
+          [&::-webkit-scrollbar-track]:bg-scrollbar-track
+          [&::-webkit-scrollbar-thumb]:rounded-full
+          [&::-webkit-scrollbar-thumb]:bg-(--color_naranja)
+        ">
           <Outlet />
         </main>
       </div>

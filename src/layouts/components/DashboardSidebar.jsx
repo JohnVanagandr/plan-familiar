@@ -57,7 +57,7 @@ export const DashboardSidebar = ({
       `}
     >
 
-      <div className="bg-white h-full rounded-3xl shadow-2xl shadow-slate-900/20 p-5 flex flex-col gap-3">
+      <div className="bg-white h-full max-h-250 rounded-3xl shadow-2xl shadow-slate-900/20 p-5 flex flex-col gap-3">
 
         {/* Luz ambiental sutil */}
         {/* <div className="absolute top-0 right-0 w-32 h-32 bg-(--color_naranja) rounded-full blur-3xl opacity-10 pointer-events-none"></div> */}

@@ -7,7 +7,7 @@ export const PublicLayout = () => {
   const hideHeader = matches.some((match) => match.handle?.hideHeader);
 
   return (
-    <div className="min-h-screen flex flex-col text-slate-900 pt-10 overflow-hidden">
+    <div className="min-h-screen flex flex-col text-slate-900 pt-10 ">
       
       {/* El header se muestra u oculta dinámicamente según la ruta */}
       {!hideHeader && (
