@@ -20,9 +20,29 @@ export const DashboardSidebar = ({
 
   // Detección segura del workspace del plan mediante segmentos de URL
   const pathSegments = location.pathname.split('/');
-  const isPlansRoute = pathSegments[1] === 'dashboard' && pathSegments[2] === 'plans';
-  const currentPlanId = isPlansRoute && pathSegments[3] && pathSegments[3] !== 'new' ? pathSegments[3] : null;
+  // const isPlansRoute = pathSegments[1] === 'dashboard' && pathSegments[2] === 'plans';
+  // const currentPlanId = isPlansRoute && pathSegments[3] && pathSegments[3] !== 'new' ? pathSegments[3] : null;
+  // const isInPlanWorkspace = Boolean(currentPlanId);
+
+  // Buscamos el índice exacto donde aparece 'planes-familiares' dentro de la URL
+  const plansIndex = pathSegments.findIndex(segment => segment === 'planes-familiares');
+  
+  // Verificamos si existe 'planes-familiares' en la URL
+  const isPlansRoute = plansIndex !== -1;
+  
+  // El ID del plan siempre será la palabra que está justo DESPUÉS de 'planes-familiares'
+  const possiblePlanId = isPlansRoute ? pathSegments[plansIndex + 1] : null;
+  
+  // Validamos que el ID exista y no sea una subruta fija de creación como "new"
+  const currentPlanId = possiblePlanId && possiblePlanId !== 'new' ? possiblePlanId : null;
+  
+  // Si encontramos un ID válido, se activan los 10 módulos del plan
   const isInPlanWorkspace = Boolean(currentPlanId);
+
+  // Reconstruimos la ruta base dinámica del plan (ej: "/planes-familiares/1" o "/dashboard/planes-familiares/1")
+  const planBasePath = isPlansRoute 
+    ? `/${pathSegments.slice(0, plansIndex + 2).join('/')}` 
+    : '/planes-familiares';
 
   // Clases dinámicas con indicador visual de acento institucional (#FF6600)
   const navLinkClasses = ({ isActive }) => `
@@ -37,7 +57,7 @@ export const DashboardSidebar = ({
 
   // Los 9 módulos de administración secundaria del plan
   const planWorkspaceModules = [
-    { label: "Prensentación", path: "presentacion-familia", icon: Home },
+    { label: "Prensentación", path: "", icon: Home },
     { label: "Datos Básicos", path: "datos-basicos", icon: FileText },
     { label: "Integrantes", path: "integrantes", icon: Users },
     { label: "Mascotas y Animales", path: "mascotas", icon: PawPrint },
@@ -140,7 +160,7 @@ export const DashboardSidebar = ({
               </NavLink>
 
               <NavLink
-                to="/dashboard/plans"
+                to="/planes-familiares"
                 title="Historial de Planes"
                 className={navLinkClasses}
               >
@@ -190,7 +210,7 @@ export const DashboardSidebar = ({
                       ? "lg:justify-center lg:w-12 lg:h-12 lg:p-0"
                       : "px-4 py-2.5 gap-3"
                   }`}
-                  onClick={() => navigate("/dashboard/plans")}
+                  onClick={() => navigate("/planes-familiares")}
                   title="Regresar al historial de planes"
                 >
                   <ArrowLeft className="w-4 h-4 shrink-0" />
@@ -210,7 +230,7 @@ export const DashboardSidebar = ({
 
               {planWorkspaceModules.map((module, idx) => {
                 const Icon = module.icon;
-                const targetPath = `/dashboard/plans/${currentPlanId}/${module.path}`;
+                const targetPath = `/planes-familiares/${currentPlanId}/${module.path}`;
 
                 return (
                   <NavLink

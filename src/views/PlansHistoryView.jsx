@@ -15,7 +15,7 @@ export const PlansHistoryView = () => {
   const handleCreateNew = () => {
     // Genera un ID temporal y redirige al primer módulo del nuevo plan
     const newId = Date.now().toString();
-    navigate(`/dashboard/plans/${newId}/datos-principales`);
+    navigate(`/planes-familiares/${newId}`);
   };
 
   return (
@@ -57,7 +57,7 @@ export const PlansHistoryView = () => {
               <Button 
                 variant="secondary" 
                 size="sm" 
-                onClick={() => navigate(`/dashboard/plans/${plan.id}/datos-principales`)}
+                onClick={() => navigate(`/planes-familiares/${plan.id}`)}
               >
                 <span>Administrar Plan</span>
                 <ArrowRight className="w-4 h-4" />
