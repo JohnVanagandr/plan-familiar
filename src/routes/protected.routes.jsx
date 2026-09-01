@@ -8,8 +8,9 @@ import { SettingsView } from '@/views/SettingsView';
 // Nuevas vistas del ciclo de planes y administración
 import { PlansHistoryView } from '@/views/PlansHistoryView';
 import { PlanWorkspaceView } from '@/views/PlanWorkspaceView';
-import { DatosPrincipalesView } from '@/views/plans/DatosPrincipalesView';
+import { DatosBasicosView } from '@/views/plans/DatosBasicosView';
 import { IntegrantesView } from '@/views/plans/IntegrantesView';
+import { PresentacionView } from '@/views/plans/PresentacionView';
 
 export const protectedRoutes = [
   {
@@ -28,13 +29,14 @@ export const protectedRoutes = [
       },
       { 
         path: "/dashboard/plans/:planId", 
-        element: <PlanWorkspaceView />,
+        // element: <PlanWorkspaceView />,
         children: [
           // Redirección por defecto al primer módulo del plan
           { index: true, element: <Navigate to="datos-principales" replace /> },
           
           // Los 9 módulos de administración del plan
-          { path: "datos-principales", element: <DatosPrincipalesView /> },
+          { path: "presentacion-familia", element: <PresentacionView /> },
+          { path: "datos-basicos", element: <DatosBasicosView /> },
           { path: "integrantes", element: <IntegrantesView /> },
           { path: "mascotas", element: <div>Vista Mascotas y Animales</div> },
           { path: "vivienda", element: <div>Vista Gráfico de Vivienda</div> },

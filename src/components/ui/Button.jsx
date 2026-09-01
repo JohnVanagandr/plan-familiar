@@ -20,14 +20,14 @@ export const Button = ({
     primary: "bg-[var(--color_naranja)] text-white border border-transparent shadow-sm shadow-[#FF6600]/20 hover:brightness-110 hover:shadow-md hover:shadow-[#FF6600]/30 hover:-translate-y-0.5 focus-visible:ring-[var(--color_naranja)]",
     secondary: "bg-[var(--color_azul)] text-white border border-transparent shadow-sm shadow-[#0770CC]/20 hover:brightness-110 hover:shadow-md hover:shadow-[#0770CC]/30 hover:-translate-y-0.5 focus-visible:ring-[var(--color_azul)]",
     accent: "bg-[#FF6600] text-white border border-transparent shadow-sm shadow-[#FF6600]/20 hover:bg-[#e05b00] hover:shadow-md hover:shadow-[#FF6600]/30 hover:-translate-y-0.5 focus-visible:ring-[#FF6600]",
-    secondary: "bg-white text-slate-700 border border-slate-200 shadow-sm hover:border-[#0770CC]/50 hover:text-[#0770CC] hover:bg-slate-50 hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-[#0770CC]",
+    third: "bg-white text-slate-700 border border-slate-200 shadow-sm hover:border-[#0770CC]/50 hover:text-[#0770CC] hover:bg-slate-50 hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-[#0770CC]",
     danger: "bg-red-500 text-white border border-transparent shadow-sm shadow-red-500/20 hover:bg-red-600 hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-red-500",
     success: "bg-emerald-500 text-white border border-transparent shadow-sm shadow-emerald-500/20 hover:bg-emerald-600 hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-emerald-500",
     "outline-primary": "border-2 border-[#0770CC] text-[#0770CC] bg-transparent hover:bg-[#0770CC] hover:text-white hover:shadow-sm hover:-translate-y-0.5 focus-visible:ring-[#0770CC]",
     "outline-secondary": "border-2 border-slate-200 text-slate-600 bg-transparent hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 hover:-translate-y-0.5 focus-visible:ring-slate-300",
     ghost: "bg-transparent text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 active:bg-slate-200 focus-visible:ring-slate-300",
     glass: "bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20 hover:shadow-lg focus-visible:ring-white",
-    sidebar: "bg-white/10 text-white hover:bg-white/20 border border-white/20 shadow-sm font-medium"
+    sidebar: " bg-(--color_naranja) text-white hover:scale-110 border border-white/20 font-medium"
   };
 
   const sizes = {
