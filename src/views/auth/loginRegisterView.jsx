@@ -243,7 +243,7 @@ const LoginRegisterView = () => {
           <h1 className="text-(--color_azul) text-3xl font-bold">Registro</h1>
 
           <form
-            className="flex flex-col gap-7 h-full justify-center w-full"
+            className="flex flex-col gap-7 h-full justify-center w-full items-center"
             onSubmit={handleRegisterSubmit}
             noValidate
           >
@@ -380,7 +380,7 @@ const LoginRegisterView = () => {
 
             </div>
 
-            <Button type="submit" variant="primary" size="lg">
+            <Button type="submit" className="w-fit!" variant="primary" size="lg">
               Registrarse
             </Button>
           </form>
