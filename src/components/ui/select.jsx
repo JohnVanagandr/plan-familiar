@@ -103,7 +103,7 @@ export function Select({
             singleValue: () => "text-slate-900 text-start",
             input: () => "text-slate-900",
             menu: () =>
-              "bg-white text-slate-900 rounded-2xl p-2 mt-2 shadow-lg border border-slate-100 overflow-hidden z-50",
+              "bg-white text-slate-900 rounded-2xl p-2 mt-2 mb-2 shadow-lg border border-slate-100 overflow-hidden z-50",
             option: ({ isFocused, isSelected }) =>
               `px-3 py-2 cursor-pointer rounded-xl mb-0.5 text-sm transition-colors ${
                 isSelected

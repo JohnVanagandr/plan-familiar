@@ -77,7 +77,7 @@ export const DashboardSidebar = ({
       `}
     >
 
-      <div className="bg-white h-full max-h-250 rounded-3xl shadow-2xl shadow-slate-900/20 p-5 flex flex-col gap-3">
+      <div className="bg-white h-full min-h-100 max-h-250 rounded-3xl p-5 flex flex-col gap-3 overflow-hidden">
 
         {/* Luz ambiental sutil */}
         {/* <div className="absolute top-0 right-0 w-32 h-32 bg-(--color_naranja) rounded-full blur-3xl opacity-10 pointer-events-none"></div> */}
@@ -135,7 +135,7 @@ export const DashboardSidebar = ({
         </div>
 
         {/* Navegación Condicional */}
-        <nav className="flex-1 space-y-1.5 relative z-10">
+        <nav className="flex-1 space-y-1.5 relative z-10 overflow-y-auto rounded-t-3xl">
           {!isInPlanWorkspace ? (
             // --- MENÚ DE NAVEGACIÓN GLOBAL ---
             <>
@@ -199,13 +199,13 @@ export const DashboardSidebar = ({
             </>
           ) : (
             // --- NAVEGACIÓN SECUNDARIA (LOS 9 MÓDULOS DE ADMINISTRACIÓN) ---
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 bg-(--color_azul)/5 p-1.5 w-full rounded-3xl">
               {/* BOTÓN DE RETORNO AL HISTORIAL USANDO EL COMPONENTE UI <Button /> */}
               <div className="mb-2 w-full flex justify-center">
                 <Button
                   variant="sidebar"
                   size="sm"
-                  className={`w-full justify-start ${
+                  className={`w-full justify-start rounded-full! ${
                     isDesktopCollapsed
                       ? "lg:justify-center lg:w-12 lg:h-12 lg:p-0"
                       : "px-4 py-2.5 gap-3"
@@ -236,6 +236,7 @@ export const DashboardSidebar = ({
                   <NavLink
                     key={idx}
                     to={targetPath}
+                    end={module.path === ""}
                     title={module.label}
                     className={navLinkClasses}
                   >

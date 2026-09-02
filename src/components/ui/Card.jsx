@@ -6,7 +6,7 @@ export const Card = ({
   ...props
 }) => {
   // Clases Base: Overflow, display y física de animación encapsulada
-  const baseClasses = "group relative rounded-3xl transition-all duration-500 ease-out flex flex-col overflow-hidden";
+  const baseClasses = "group relative rounded-3xl transition-all duration-500 ease-out flex flex-col";
 
   // Diccionario Óptico: Controla exclusivamente colores, bordes y sombras
   const variants = {
