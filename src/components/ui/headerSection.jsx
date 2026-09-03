@@ -16,10 +16,10 @@ export const HeaderSection = ({
 
       <div className="w-fit">
         <h1 className="w-full text-4xl flex gap-2 text-white">
-          {icon && <i className={icon + " text-(--orange)"}></i>}
+          {icon && <i className={icon + " text-(--color_naranja)"}></i>}
           {title}
         </h1>
-        {description && <p className="text-(--blue) text-start">{description}</p>}
+        {description && <p className="text-(--color_azul) text-start">{description}</p>}
       </div>
 
       {buttonSection && <Button variant='accent'>{buttonText}</Button>}

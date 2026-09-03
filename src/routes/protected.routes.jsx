@@ -24,18 +24,17 @@ export const protectedRoutes = [
 
       // --- Nuevas Rutas de Gestión de Planes ---
       { 
-        path: "/dashboard/plans", 
+        path: "/planes-familiares", 
         element: <PlansHistoryView /> 
       },
       { 
-        path: "/dashboard/plans/:planId", 
+        path: "/planes-familiares/:planId", 
         // element: <PlanWorkspaceView />,
         children: [
           // Redirección por defecto al primer módulo del plan
-          { index: true, element: <Navigate to="datos-principales" replace /> },
+          { index: true, element: <PresentacionView /> },
           
           // Los 9 módulos de administración del plan
-          { path: "presentacion-familia", element: <PresentacionView /> },
           { path: "datos-basicos", element: <DatosBasicosView /> },
           { path: "integrantes", element: <IntegrantesView /> },
           { path: "mascotas", element: <div>Vista Mascotas y Animales</div> },

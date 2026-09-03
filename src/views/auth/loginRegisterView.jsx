@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { loginSchema } from "@/features/auth/schemas/auth.schema.js";
 import { registerSchema } from "@/features/auth/schemas/register.schema.js";
-import { Alert } from "@/components/ui/alerts.jsx";
+import { Alert } from "@/components/ui/Alerts.jsx";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useFormValidation } from "@/features/auth/hooks/useFormValidation.js";
-import { Select } from "@/components/ui/select.jsx";
+import { Select } from "@/components/ui/Select.jsx";
 import { Button, Input, Link } from '@/components/ui'; 
 import { Building2, Calendar, CircleCheckBig, Hash, IdCard, Lock, Mail, MapPin, Phone, UserRound, VenusAndMars } from "lucide-react";
 
