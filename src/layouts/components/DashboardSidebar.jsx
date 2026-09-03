@@ -5,7 +5,8 @@ import {
   ListOrdered, X, ChevronLeft, ChevronRight, 
   PawPrint,
   Hospital,
-  ScanBox
+  ScanBox,
+  Send
 } from 'lucide-react';
 import { Badge, Button } from '@/components/ui';
 
@@ -46,13 +47,15 @@ export const DashboardSidebar = ({
 
   // Clases dinámicas con indicador visual de acento institucional (#FF6600)
   const navLinkClasses = ({ isActive }) => `
-    flex items-center rounded-full font-medium text-xs sm:text-sm transition-all duration-300 ease-out relative group overflow-hidden
+    px-5 gap-2 flex items-center rounded-full font-medium text-xs sm:text-sm transition-all duration-300 ease-out relative group overflow-hidden h-12
     ${isActive 
       ? "bg-(--color_azul) font-semibold text-white" 
       : "text-slate-500 hover:bg-(--color_azul)/10"
     }
-    ${isDesktopCollapsed ? "lg:justify-center lg:w-12 lg:h-12 lg:mx-auto lg:p-0 lg:border-l-0" : "px-4 py-2.5 gap-3 w-full"}
-    px-4 py-2.5 gap-3 w-full
+    ${isDesktopCollapsed 
+      ? "lg:justify-center lg:w-12 lg:mx-auto lg:p-0" 
+      : "px-4 w-full"
+    }
   `;
 
   // Los 9 módulos de administración secundaria del plan
@@ -73,7 +76,7 @@ export const DashboardSidebar = ({
     <aside
       className={`p-5 fixed lg:static inset-y-0 left-0 z-40 flex flex-col transform transition-all duration-300 ease-in-out shrink-0
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-        ${isDesktopCollapsed ? "lg:w-35" : "lg:w-72"} w-72
+        ${isDesktopCollapsed ? "lg:w-35" : "lg:w-80"} w-80
       `}
     >
 
@@ -90,7 +93,7 @@ export const DashboardSidebar = ({
         >
           <div
               className={`flex items-start gap-1 overflow-hidden transition-all duration-300 whitespace-nowrap ${
-                isDesktopCollapsed ? "lg:w-0 lg:opacity-0 lg:hidden" : "w-auto opacity-100"
+                isDesktopCollapsed ? "lg:w-0 lg:opacity-0 lg:scale-0" : "w-auto opacity-100 scale-100"
               }`}
           >
 
@@ -135,7 +138,14 @@ export const DashboardSidebar = ({
         </div>
 
         {/* Navegación Condicional */}
-        <nav className="flex-1 space-y-1.5 relative z-10 overflow-y-auto rounded-t-3xl">
+        <nav className="flex-1 space-y-1.5 relative z-10 overflow-y-auto overflow-x-hidden rounded-4xl
+          [&::-webkit-scrollbar]:h-2
+          [&::-webkit-scrollbar]:w-1
+          [&::-webkit-scrollbar-track]:rounded-full
+          [&::-webkit-scrollbar-track]:bg-scrollbar-track
+          [&::-webkit-scrollbar-thumb]:rounded-full
+          [&::-webkit-scrollbar-thumb]:bg-(--color_azul)
+        ">
           {!isInPlanWorkspace ? (
             // --- MENÚ DE NAVEGACIÓN GLOBAL ---
             <>
@@ -148,10 +158,10 @@ export const DashboardSidebar = ({
                 {({ isActive }) => (
                   <>
                     <LayoutDashboard
-                      className={`w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                      className={`translate-x-1 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
                     />
                     <span
-                      className={`whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:hidden" : "block"}`}
+                      className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
                     >
                       Panel Principal
                     </span>
@@ -167,10 +177,10 @@ export const DashboardSidebar = ({
                 {({ isActive }) => (
                   <>
                     <FileText
-                      className={`w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                      className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
                     />
                     <span
-                      className={`whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:hidden" : "block"}`}
+                      className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
                     >
                       Historial de Planes
                     </span>
@@ -186,10 +196,10 @@ export const DashboardSidebar = ({
                 {({ isActive }) => (
                   <>
                     <PhoneCall
-                      className={`w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                      className={`translate-x-1 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
                     />
                     <span
-                      className={`whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:hidden" : "block"}`}
+                      className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
                     >
                       Contactos Operativos
                     </span>
@@ -199,23 +209,23 @@ export const DashboardSidebar = ({
             </>
           ) : (
             // --- NAVEGACIÓN SECUNDARIA (LOS 9 MÓDULOS DE ADMINISTRACIÓN) ---
-            <div className="space-y-1.5 bg-(--color_azul)/5 p-1.5 w-full rounded-3xl">
+            <div className="space-y-1.5 bg-(--color_azul)/5 p-1.5 w-full rounded-4xl">
               {/* BOTÓN DE RETORNO AL HISTORIAL USANDO EL COMPONENTE UI <Button /> */}
-              <div className="mb-2 w-full flex justify-center">
+              <div className="mb-2 flex justify-center">
                 <Button
                   variant="sidebar"
                   size="sm"
-                  className={`w-full justify-start rounded-full! ${
+                  className={`h-12 w-full justify-start transition-all duration-300 ${
                     isDesktopCollapsed
                       ? "lg:justify-center lg:w-12 lg:h-12 lg:p-0"
-                      : "px-4 py-2.5 gap-3"
+                      : "px-4 py-2.5"
                   }`}
                   onClick={() => navigate("/planes-familiares")}
                   title="Regresar al historial de planes"
                 >
-                  <ArrowLeft className="w-4 h-4 shrink-0" />
+                  <ArrowLeft className="w-4 h-4 shrink-0 translate-x-1" />
                   <span
-                    className={`whitespace-nowrap transition-all duration-300 ${isDesktopCollapsed ? "lg:hidden" : "block"}`}
+                    className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
                   >
                     Volver al Historial
                   </span>
@@ -223,7 +233,7 @@ export const DashboardSidebar = ({
               </div>
 
               {!isDesktopCollapsed && (
-                <div className="px-3 py-1 text-[10px] uppercase font-extrabold tracking-wider text-slate-400">
+                <div className="px-4 py-1 text-[10px] uppercase font-extrabold tracking-wider text-slate-400 text-nowrap">
                   Módulos del Plan
                 </div>
               )}
@@ -243,10 +253,10 @@ export const DashboardSidebar = ({
                     {({ isActive }) => (
                       <>
                         <Icon
-                          className={`w-4 h-4 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-200 group-hover:text-(--color_naranja)"}`}
+                          className={`translate-x-2 w-4 h-4 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-200 group-hover:text-(--color_naranja)"}`}
                         />
                         <span
-                          className={`whitespace-nowrap transition-all duration-300 ${isDesktopCollapsed ? "lg:hidden" : "block"}`}
+                          className={`pl-2 overflow-hidden whitespace-nowrap transition-all duration-300 ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
                         >
                           {module.label}
                         </span>
@@ -255,6 +265,23 @@ export const DashboardSidebar = ({
                   </NavLink>
                 );
               })}
+
+              <div className='w-full'>
+                <Button 
+                  variant='sidebar'
+                  size='sm'
+                  className={`h-12 w-full justify-start transition-all duration-300 ${
+                    isDesktopCollapsed
+                      ? "lg:justify-center lg:w-12 lg:h-12 lg:p-0"
+                      : "px-4 py-2.5"
+                  }`}
+                >
+                  <Send className="w-4 h-4 shrink-0 translate-x-1/2"/>
+                  <span className={`pl-2 overflow-hidden whitespace-nowrap transition-all duration-300 ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}>
+                    Enviar
+                  </span>
+                </Button>
+              </div>
             </div>
           )}
         </nav>

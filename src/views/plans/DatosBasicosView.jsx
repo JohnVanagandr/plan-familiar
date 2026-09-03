@@ -19,17 +19,19 @@ import {
   UsersRound,
 } from "lucide-react";
 import { useFormValidation } from "@/features/auth/hooks/useFormValidation.js";
+import { familyDatosSchema } from "@/features/auth/schemas/familyDatos.schema";
 
 // Mock: reemplazar por la petición real (GET /familyPlans/:id) cuando se reconecte la lógica
 const familiaMock = {
   id: 12,
   last_names: "García Pérez",
   zone_id: "2",
+  department_id: "1",
   city_id: "1",
   address: "Calle 45 #12-34",
-  sector_id: "1",
-  sector_name: "La Esperanza",
-  landline_phone: "6017894561",
+  // sector_id: "1",
+  // sector_name: "La Esperanza",
+  // landline_phone: "6017894561",
   housing_quality_id: "1",
   familyType: { name: "Vulnerable" },
 };
@@ -38,6 +40,12 @@ const familiaMock = {
 const zonas = [
   { value: "1", label: "Rural" },
   { value: "2", label: "Urbana" },
+];
+
+const departamentos = [
+  { value: "1", label: "Santander" },
+  { value: "2", label: "Cundinamarca" },
+  { value: "3", label: "Antioquia" },
 ];
 
 const ciudades = [
@@ -68,6 +76,7 @@ export const DatosBasicosView = () => {
   const initial_state = {
     apellidos: familiaData.last_names ?? "",
     zona: familiaData.zone_id ?? "",
+    departamento: familiaData.department_id ?? "",
     ciudad: familiaData.city_id ?? "",
     direccion: familiaData.address ?? "",
     sector: familiaData.sector_id ?? "",
@@ -76,7 +85,7 @@ export const DatosBasicosView = () => {
     calidadVivienda: familiaData.housing_quality_id ?? "",
   };
 
-  const { values, errors, handleChange, validate } = useFormValidation(initial_state);
+  const { values, errors, handleChange, validate } = useFormValidation(initial_state, familyDatosSchema);
 
   const [showToast, setShowToast] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
@@ -101,7 +110,7 @@ export const DatosBasicosView = () => {
       {/* Panel de presentación */}
       <Card
         padding="none"
-        className=" relative w-full p-4! flex flex-col justify-between items-center gap-6 lg:max-w-md"
+        className=" relative w-full p-4! flex flex-col sm:flex-row lg:flex-col justify-between items-center gap-6 lg:max-w-md"
       >
         <div className="w-full">
           <h1 className="w-full text-3xl font-bold flex items-center gap-2 text-(--color_azul) sm:text-4xl">
@@ -136,8 +145,18 @@ export const DatosBasicosView = () => {
             name="zona"
             value={values.zona}
             onChange={handleChange}
-            options={zonas}
+            arrayOptions={zonas}
             error={errors.zona}
+          />
+
+          <Select
+            icon={Building2}
+            placeholder="Seleccione el departamento"
+            name="departamento"
+            value={values.departamento}
+            onChange={handleChange}
+            arrayOptions={departamentos}
+            error={errors.departamento}
           />
 
           <Select
@@ -146,7 +165,7 @@ export const DatosBasicosView = () => {
             name="ciudad"
             value={values.ciudad}
             onChange={handleChange}
-            options={ciudades}
+            arrayOptions={ciudades}
             error={errors.ciudad}
           />
 
@@ -166,7 +185,7 @@ export const DatosBasicosView = () => {
             name="sector"
             value={values.sector}
             onChange={handleChange}
-            options={sectores}
+            arrayOptions={sectores}
             error={errors.sector}
           />
 
@@ -196,7 +215,7 @@ export const DatosBasicosView = () => {
             name="calidadVivienda"
             value={values.calidadVivienda}
             onChange={handleChange}
-            options={calidadesVivienda}
+            arrayOptions={calidadesVivienda}
             error={errors.calidadVivienda}
           />
 
