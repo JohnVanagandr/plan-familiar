@@ -19,7 +19,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { useFormValidation } from "@/features/auth/hooks/useFormValidation.js";
-import { familyDatosSchema } from "@/features/auth/schemas/familyDatos.schema";
+import { familyDatosSchema } from "@/features/plans/schemas/familyDatos.schema";
 
 // Mock: reemplazar por la petición real (GET /familyPlans/:id) cuando se reconecte la lógica
 const familiaMock = {

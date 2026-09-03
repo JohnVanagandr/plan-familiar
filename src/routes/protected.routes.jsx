@@ -9,8 +9,10 @@ import { SettingsView } from '@/views/SettingsView';
 import { PlansHistoryView } from '@/views/PlansHistoryView';
 import { PlanWorkspaceView } from '@/views/PlanWorkspaceView';
 import { DatosBasicosView } from '@/views/plans/DatosBasicosView';
-import { IntegrantesView } from '@/views/plans/IntegrantesView';
 import { PresentacionView } from '@/views/plans/PresentacionView';
+//INTEGRANTES
+import { IntegrantesCreateView, IntegrantesEditView, IntegrantesView } from '@/views/plans/Integrantes';
+
 
 export const protectedRoutes = [
   {
@@ -31,18 +33,50 @@ export const protectedRoutes = [
         path: "/planes-familiares/:planId", 
         // element: <PlanWorkspaceView />,
         children: [
-          // Redirección por defecto al primer módulo del plan
+          // Redirección por defecto al primer módulo del plan, la presentación
           { index: true, element: <PresentacionView /> },
           
           // Los 9 módulos de administración del plan
           { path: "datos-basicos", element: <DatosBasicosView /> },
-          { path: "integrantes", element: <IntegrantesView /> },
-          { path: "mascotas", element: <div>Vista Mascotas y Animales</div> },
+
+          { path: "integrantes",
+            children: [
+              { index: true, element: <IntegrantesView /> },
+              { path:"crear", element:<IntegrantesCreateView /> },
+              { path:":integranteId/editar", element:<IntegrantesEditView /> }
+            ]
+          },
+
+          { path: "mascotas", element: <div>Vista Mascotas y Animales</div>,
+            children: [
+              { index: true, },
+              { path:"crear", },
+              { path:":animalId/editar" }
+            ]
+          },
+
           { path: "vivienda", element: <div>Vista Gráfico de Vivienda</div> },
+
           { path: "georeferenciacion", element: <div>Vista Georreferenciación</div> },
+
           { path: "entorno", element: <div>Vista Gráfico de Entorno</div> },
-          { path: "riesgos", element: <RisksView /> }, // Reutilizando componentes institucionales
-          { path: "recursos", element: <div>Vista Recursos Disponibles</div> },
+
+          { path: "riesgos", element: <RisksView /> ,
+            children: [
+              { index: true, },
+              { path:"crear", },
+              { path:":riesgoId/editar" }
+            ]
+          },
+
+          { path: "recursos", element: <div>Vista Recursos Disponibles</div>,
+            children: [
+              { index: true, },
+              { path:"crear", },
+              { path:":recursoId/editar" }
+            ]
+          },
+
           { path: "plan-accion", element: <div>Vista Plan de Acción</div> },
         ]
       },

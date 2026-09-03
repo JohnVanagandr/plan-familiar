@@ -4,17 +4,17 @@ import { Bubbles, File } from "lucide-react";
 export const PresentacionView = () => {
 
     return (
-      <div className="relative h-full min-h-fit max-h-200 w-full rounded-2xl flex justify-between items-center">
-        <div className="w-full flex gap-2">
-          <Bubbles className="size-20 text-(--color_azul) mt-10"/>
-          <div className="w-full text-4xl flex gap-2 text-white text-start flex-col">
+      <div className="relative h-full min-h-fit max-h-200 w-full rounded-2xl flex justify-between items-center flex-col px-10 pt-30 xl:flex-row lg:px-5">
+        <div className="w-full flex gap-2 relative">
+          <Bubbles className="size-40 text-white/25 mt-10 absolute left-40 -top-5"/>
+          <div className="w-full text-4xl flex gap-2 text-white text-start flex-col z-10">
 
-            <span className="w-fit py-0.5 px-4 bg-(--color_azul) rounded-r-full text-lg">
+            <span className="w-45 text-end py-0.5 px-4 bg-(--color_azul) rounded-r-full text-lg -translate-x-15 lg:rounded-full lg:w-fit lg:translate-x-0 lg:text-center">
               {/* {familia.statusPlan.name} */}
               En desarrollo
             </span>
 
-            <h1>
+            <h1 className="font-bold">
                 Familia <br />
                 {/* {familia.last_names} */}
                 Garcia Ramirez
@@ -42,7 +42,7 @@ export const PresentacionView = () => {
         <img
           src="/svg/ilustracion_familia_a.svg"
           alt=""
-          className="w-120 animate-float"
+          className="w-150 animate-float"
         />
       </div>
     );
