@@ -138,14 +138,15 @@ export const DashboardSidebar = ({
         </div>
 
         {/* Navegación Condicional */}
-        <nav className="flex-1 space-y-1.5 relative z-10 overflow-y-auto overflow-x-hidden rounded-4xl
+        <nav className={`flex-1 space-y-1.5 relative z-10 overflow-y-auto overflow-x-hidden
           [&::-webkit-scrollbar]:h-2
           [&::-webkit-scrollbar]:w-1
           [&::-webkit-scrollbar-track]:rounded-full
           [&::-webkit-scrollbar-track]:bg-scrollbar-track
           [&::-webkit-scrollbar-thumb]:rounded-full
           [&::-webkit-scrollbar-thumb]:bg-(--color_azul)
-        ">
+          ${isInPlanWorkspace ? "rounded-4xl" : "rounded-0"}
+        `}>
           {!isInPlanWorkspace ? (
             // --- MENÚ DE NAVEGACIÓN GLOBAL ---
             <>
