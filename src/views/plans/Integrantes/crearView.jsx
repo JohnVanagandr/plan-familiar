@@ -4,16 +4,11 @@ import { Card, Button, Input, Select, Alert } from "@/components/ui";
 import HeaderSection from "@/components/ui/headerSection";
 import { 
   UserRound, 
-  IdCard, 
-  Info, 
-  User, 
+  IdCard,
   Calendar, 
   Activity, 
-  Users, 
-  HeartPulse, 
   Flag, 
-  Phone, 
-  UserPlus, 
+  Phone,  
   UserRoundPlus,
   Hash,
   VenusAndMars,

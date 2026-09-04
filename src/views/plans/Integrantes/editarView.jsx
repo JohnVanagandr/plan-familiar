@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import { useFormValidation } from "@/features/auth/hooks/useFormValidation.js";
 import { memberSchema } from "@/features/plans/schemas/member.schema"; // Ajusta según tu esquema
-import { hash } from "zod";
 
 export const EditarView = () => {
   const { id } = useParams();

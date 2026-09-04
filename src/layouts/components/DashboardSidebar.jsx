@@ -63,7 +63,7 @@ export const DashboardSidebar = ({
     { label: "Prensentación", path: "", icon: Home },
     { label: "Datos Básicos", path: "datos-basicos", icon: FileText },
     { label: "Integrantes", path: "integrantes", icon: Users },
-    { label: "Mascotas y Animales", path: "mascotas", icon: PawPrint },
+    { label: "Mascotas y Animales", path: "animales", icon: PawPrint },
     { label: "Gráfico de Vivienda", path: "vivienda", icon: ScanBox },
     { label: "Georreferenciación", path: "georeferenciacion", icon: MapPin },
     { label: "Gráfico de Entorno", path: "entorno", icon: Compass },
