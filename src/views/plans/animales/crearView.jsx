@@ -3,82 +3,44 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Card, Button, Input, Select, Alert } from "@/components/ui";
 import HeaderSection from "@/components/ui/headerSection";
 import { 
-  UserRound, 
-  IdCard, 
-  Info, 
-  User, 
   Calendar, 
-  Activity, 
-  Users, 
-  HeartPulse, 
-  Flag, 
-  Phone, 
-  UserPlus, 
-  UserRoundPlus,
-  Hash,
   VenusAndMars,
-  UsersRound,
-  Droplet
+  PawPrint,
+  Dna,
+  Heart
 } from "lucide-react";
 import { useFormValidation } from "@/features/auth/hooks/useFormValidation.js";
-import { memberSchema } from "@/features/plans/schemas/member.schema"; // Ajusta según tu esquema
+import { petSchema } from "@/features/plans/schemas/pet.schema";
+import { SpecieIcon } from "@/helpers/SpecieIcon";
 
 export const CrearView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Opciones estáticas para maquetación visual
-  const tiposDocumento = [
-    { value: "1", label: "Cédula de Ciudadanía" },
-    { value: "2", label: "Tarjeta de Identidad" },
-    { value: "3", label: "Registro Civil" },
+  const especies = [
+    { value: "1", label: "Perro" },
+    { value: "2", label: "Gato" },
+    { value: "3", label: "Ave" },
+    { value: "4", label: "Roedor" },
   ];
 
-  const generos = [
-    { value: "1", label: "Masculino" },
-    { value: "2", label: "Femenino" },
-  ];
-
-  const parentescos = [
-    { value: "1", label: "Cabeza de familia" },
-    { value: "2", label: "Cónyuge" },
-    { value: "4", label: "Hijo/a" },
-  ];
-
-  const gruposSanguineos = [
-    { value: "1", label: "A+" },
-    { value: "3", label: "B+" },
-    { value: "7", label: "O+" },
-  ];
-
-  const nacionalidades = [
-    { value: "1", label: "Colombiana" },
-    { value: "2", label: "Venezolana" },
-  ];
-
-  const eps = [
-    { value: "1", label: "Sura" },
-    { value: "2", label: "Sanitas" },
-    { value: "3", label: "Salud Total" },
+  const generosAnimal = [
+    { value: "1", label: "Macho" },
+    { value: "2", label: "Hembra" },
   ];
 
   const initialValues = {
-    nombres: "",
-    apellidos: "",
-    tipoDocumento: "",
-    numeroDocumento: "",
-    genero: "",
-    nacimiento: "",
-    eps: "",
-    parentesco: "",
-    grupoSanguineo: "",
-    nacionalidad: "",
-    celularPersonal: "",
+    name: "",
+    breed: "",
+    birth_date: "",
+    animal_gender_id: "",
+    species_id: "",
+    family_plan_id: id,
   };
 
   const { values, errors, handleChange, validate } = useFormValidation(
     initialValues,
-    memberSchema
+    petSchema
   );
 
   const [alertConfig, setAlertConfig] = useState({
@@ -96,13 +58,13 @@ export const CrearView = () => {
       setAlertConfig({
         isVisible: true,
         variant: "yesno",
-        text: "¿Deseas agregar enfermedades o afecciones que padezca el integrante?",
+        text: "¿Deseas agregar las vacunas que tiene la mascota?",
         onConfirm: () => {
           setAlertConfig((prev) => ({ ...prev, isVisible: false }));
-          navigate(`/planes-familiares/${id}/integrantes/1/editar`);
+          navigate(`/planes-familiares/${id}/animales/1/editar`);
         },
         onCancel: () => {
-          navigate(`/planes-familiares/${id}/integrantes`);
+          navigate(`/planes-familiares/${id}/animales`);
         },
       });
     } else {
@@ -113,134 +75,72 @@ export const CrearView = () => {
   return (
     <div className="w-full flex flex-col gap-6">
       <HeaderSection
-        icon={<UserRoundPlus />}
-        title="Nuevo Integrante"
-        description="Ingresa los datos para registrar un nuevo integrante a la familia."
-        image="/svg/ilustracion_familia_c.svg"
+        icon={<PawPrint />}
+        title="Nueva Mascota"
+        description="Ingresa los datos para registrar una nueva mascota o animal de compañía."
+        image="/svg/ilustracion_mascotas.svg"
         buttonSection
         buttonText="Volver"
-        onButtonClick={() => navigate(`/planes-familiares/${id}/integrantes`)}
+        onButtonClick={() => navigate(`/planes-familiares/${id}/animales`)}
       />
 
       <Card padding="none" className="w-full p-5 sm:p-7">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <h2 className="text-lg font-bold text-(--color_azul) flex items-center gap-2 mb-2">
-            <UserRound className="size-5 text-(--color_naranja)" />
-            Datos del integrante
+            <PawPrint className="size-5 text-(--color_naranja)" />
+            Datos de la mascota
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              icon={UserRound}
+              icon={PawPrint}
               type="text"
-              placeholder="Nombres"
-              name="nombres"
-              value={values.nombres}
+              placeholder="Nombre"
+              name="name"
+              value={values.name}
               onChange={handleChange}
-              error={errors.nombres}
-            />
-
-            <Input
-              icon={UserRound}
-              type="text"
-              placeholder="Apellidos"
-              name="apellidos"
-              value={values.apellidos}
-              onChange={handleChange}
-              error={errors.apellidos}
+              error={errors.name}
             />
 
             <Select
-              icon={IdCard}
-              placeholder="Tipo de documento"
-              name="tipoDocumento"
-              value={values.tipoDocumento}
+              icon={Dna}
+              placeholder="Especie"
+              name="species_id"
+              value={values.species_id}
               onChange={handleChange}
-              arrayOptions={tiposDocumento}
-              error={errors.tipoDocumento}
+              arrayOptions={especies}
+              error={errors.species_id}
             />
 
             <Input
-              icon={Hash}
+              icon={Heart}
               type="text"
-              placeholder="Número de documento"
-              name="numeroDocumento"
-              value={values.numeroDocumento}
+              placeholder="Raza"
+              name="breed"
+              value={values.breed}
               onChange={handleChange}
-              error={errors.numeroDocumento}
+              error={errors.breed}
             />
 
             <Select
               icon={VenusAndMars}
               placeholder="Género"
-              name="genero"
-              value={values.genero}
+              name="animal_gender_id"
+              value={values.animal_gender_id}
               onChange={handleChange}
-              arrayOptions={generos}
-              error={errors.genero}
+              arrayOptions={generosAnimal}
+              error={errors.animal_gender_id}
             />
 
             <Input
               icon={Calendar}
               type="date"
               placeholder="Fecha de nacimiento"
-              name="nacimiento"
-              value={values.nacimiento}
+              name="birth_date"
+              value={values.birth_date}
               onChange={handleChange}
-              error={errors.nacimiento}
+              error={errors.birth_date}
             />
-
-            <Select
-              icon={Activity}
-              placeholder="EPS"
-              name="eps"
-              value={values.eps}
-              onChange={handleChange}
-              arrayOptions={eps}
-              error={errors.eps}
-            />
-
-            <Select
-              icon={UsersRound}
-              placeholder="Parentesco"
-              name="parentesco"
-              value={values.parentesco}
-              onChange={handleChange}
-              arrayOptions={parentescos}
-              error={errors.parentesco}
-            />
-
-            <Select
-              icon={Droplet}
-              placeholder="Grupo sanguíneo"
-              name="grupoSanguineo"
-              value={values.grupoSanguineo}
-              onChange={handleChange}
-              arrayOptions={gruposSanguineos}
-              error={errors.grupoSanguineo}
-            />
-
-            <Select
-              icon={Flag}
-              placeholder="Nacionalidad"
-              name="nacionalidad"
-              value={values.nacionalidad}
-              onChange={handleChange}
-              arrayOptions={nacionalidades}
-              error={errors.nacionalidad}
-            />
-
-            <div className="sm:col-span-2">
-              <Input
-                icon={Phone}
-                type="text"
-                placeholder="Celular personal"
-                name="celularPersonal"
-                value={values.celularPersonal}
-                onChange={handleChange}
-                error={errors.celularPersonal}
-              />
-            </div>
           </div>
 
           <Button type="submit" variant="accent" size="lg" className="mt-4">

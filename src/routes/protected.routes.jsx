@@ -13,7 +13,7 @@ import { PresentacionView } from '@/views/plans/PresentacionView';
 //INTEGRANTES
 import { IntegrantesCreateView, IntegrantesEditView, IntegrantesView } from '@/views/plans/Integrantes';
 //Mascotas
-import { AnimalCreateView, AnimalesView } from '@/views/plans/animales';
+import { AnimalCreateView, AnimalEditView, AnimalesView } from '@/views/plans/animales';
 
 
 export const protectedRoutes = [
@@ -49,11 +49,11 @@ export const protectedRoutes = [
             ]
           },
 
-          { path: "mascotas",
+          { path: "animales",
             children: [
               { index: true, element:<AnimalesView /> },
-              { path:"crear", },
-              { path:":animalId/editar" }
+              { path:"crear", element:<AnimalCreateView /> },
+              { path:":animalId/editar", element:<AnimalEditView /> }
             ]
           },
 
