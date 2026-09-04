@@ -1,7 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { DashboardView } from '@/views/DashboardView';
-import { RisksView } from '@/views/RisksView';
 import { ContactsView } from '@/views/ContactsView';
 import { SettingsView } from '@/views/SettingsView';
 
@@ -14,6 +13,8 @@ import { PresentacionView } from '@/views/plans/PresentacionView';
 import { IntegrantesCreateView, IntegrantesEditView, IntegrantesView } from '@/views/plans/Integrantes';
 //Mascotas
 import { AnimalCreateView, AnimalEditView, AnimalesView } from '@/views/plans/animales';
+//Riesgos
+import { RiskFormView, RisksView } from '@/views/plans/riesgos';
 
 
 export const protectedRoutes = [
@@ -22,7 +23,6 @@ export const protectedRoutes = [
     children: [
       // Rutas base existentes
       { path: "/dashboard", element: <DashboardView /> },
-      { path: "/dashboard/risks", element: <RisksView /> },
       { path: "/dashboard/contacts", element: <ContactsView /> },
       { path: "/dashboard/settings", element: <SettingsView /> },
 
@@ -63,11 +63,11 @@ export const protectedRoutes = [
 
           { path: "entorno", element: <div>Vista Gráfico de Entorno</div> },
 
-          { path: "riesgos", element: <RisksView /> ,
+          { path: "riesgos",
             children: [
-              { index: true, },
-              { path:"crear", },
-              { path:":riesgoId/editar" }
+              { index: true, element: <RisksView />},
+              { path:"crear", element: <RiskFormView /> },
+              { path:":riesgoId/editar", element: <RiskFormView /> }
             ]
           },
 
