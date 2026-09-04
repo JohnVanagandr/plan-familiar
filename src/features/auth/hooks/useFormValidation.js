@@ -61,5 +61,5 @@ export const useFormValidation = (initialState, schema, options=[]) => {
         setErrors({});
     };
 
-    return { values, errors, handleChange, handleOption, validate, resetForm };
+    return { values, errors, handleChange, handleOption, validate, resetForm, setValues };
 };
