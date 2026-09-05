@@ -10,7 +10,7 @@ import {
   ShieldAlert 
 } from "lucide-react";
 import { useFormValidation } from "@/features/auth/hooks/useFormValidation.js";
-import { riskSchema } from "@/features/auth/schemas/risk.schema";
+import { riskSchema } from "@/features/plans/schemas/risk.schema";
 
 const tiposAmenaza = [
   { value: "1", label: "Inundación" },

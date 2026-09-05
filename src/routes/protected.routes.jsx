@@ -15,6 +15,7 @@ import { IntegrantesCreateView, IntegrantesEditView, IntegrantesView } from '@/v
 import { AnimalCreateView, AnimalEditView, AnimalesView } from '@/views/plans/animales';
 //Riesgos
 import { RiskFormView, RisksView } from '@/views/plans/riesgos';
+import { ResourcesView, ResourceFormView} from '@/views/plans/recursos';
 
 
 export const protectedRoutes = [
@@ -71,11 +72,11 @@ export const protectedRoutes = [
             ]
           },
 
-          { path: "recursos", element: <div>Vista Recursos Disponibles</div>,
+          { path: "recursos",
             children: [
-              { index: true, },
-              { path:"crear", },
-              { path:":recursoId/editar" }
+              { index: true, element: <ResourcesView />},
+              { path:"crear", element: <ResourceFormView /> },
+              { path:":recursoId/editar", element: <ResourceFormView /> }
             ]
           },
 
