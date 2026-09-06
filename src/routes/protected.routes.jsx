@@ -16,6 +16,9 @@ import { AnimalCreateView, AnimalEditView, AnimalesView } from '@/views/plans/an
 //Riesgos
 import { RiskFormView, RisksView } from '@/views/plans/riesgos';
 import { ResourcesView, ResourceFormView} from '@/views/plans/recursos';
+import EntornoGraphicView from '@/views/plans/Entorno/EntornoGraphicView';
+import { HousingCreateView, HousingEditView, HousingGraphicView } from '@/views/plans/vivienda';
+import GeoreferenceView from '@/views/plans/georeferencia/GeoreferenceView';
 
 
 export const protectedRoutes = [
@@ -58,11 +61,17 @@ export const protectedRoutes = [
             ]
           },
 
-          { path: "vivienda", element: <div>Vista Gráfico de Vivienda</div> },
+          { path: "vivienda",
+            children: [
+              { index:true, element: <HousingGraphicView /> },
+              { path:"crear", element: <HousingCreateView /> },
+              { path:":graficoId/editar", element: <HousingEditView /> }
+            ]
+          },
 
-          { path: "georeferenciacion", element: <div>Vista Georreferenciación</div> },
+          { path: "georeferenciacion", element: <GeoreferenceView/> },
 
-          { path: "entorno", element: <div>Vista Gráfico de Entorno</div> },
+          { path: "entorno", element: <EntornoGraphicView /> },
 
           { path: "riesgos",
             children: [
