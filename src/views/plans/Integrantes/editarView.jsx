@@ -23,7 +23,7 @@ import { useFormValidation } from "@/features/auth/hooks/useFormValidation.js";
 import { memberSchema } from "@/features/plans/schemas/member.schema"; // Ajusta según tu esquema
 
 export const EditarView = () => {
-  const { id } = useParams();
+  const { planId } = useParams();
   const navigate = useNavigate();
 
   // Opciones estáticas para maquetación visual
@@ -116,7 +116,7 @@ export const EditarView = () => {
         image="/svg/ilustracion_familia_c.svg"
         buttonSection
         buttonText="Volver"
-        onButtonClick={() => navigate(`/planes-familiares/${id}/integrantes`)}
+        onButtonClick={() => navigate(`/planes-familiares/${planId}/integrantes`)}
       />
 
       <div className="flex flex-col gap-6">
