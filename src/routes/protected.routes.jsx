@@ -19,6 +19,7 @@ import { ResourcesView, ResourceFormView} from '@/views/plans/recursos';
 import EntornoGraphicView from '@/views/plans/Entorno/EntornoGraphicView';
 import { HousingCreateView, HousingEditView, HousingGraphicView } from '@/views/plans/vivienda';
 import GeoreferenceView from '@/views/plans/georeferencia/GeoreferenceView';
+import PlanAccionView from '@/views/plans/plan_accion/PlanAccionView';
 
 
 export const protectedRoutes = [
@@ -89,7 +90,7 @@ export const protectedRoutes = [
             ]
           },
 
-          { path: "plan-accion", element: <div>Vista Plan de Acción</div> },
+          { path: "plan-accion", element: <PlanAccionView /> },
         ]
       },
     ]
