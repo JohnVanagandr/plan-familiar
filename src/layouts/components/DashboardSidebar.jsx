@@ -6,7 +6,8 @@ import {
   PawPrint,
   Hospital,
   ScanBox,
-  Send
+  Send,
+  Map
 } from 'lucide-react';
 import { Badge, Button } from '@/components/ui';
 
@@ -203,6 +204,25 @@ export const DashboardSidebar = ({
                       className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
                     >
                       Contactos Operativos
+                    </span>
+                  </>
+                )}
+              </NavLink>
+
+              <NavLink
+                to="/dashboard/mapa"
+                title="Contactos Operativos"
+                className={navLinkClasses}
+              >
+                {({ isActive }) => (
+                  <>
+                    <Map
+                      className={`translate-x-1 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                    />
+                    <span
+                      className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                    >
+                      Mapa
                     </span>
                   </>
                 )}
