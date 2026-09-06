@@ -9,6 +9,7 @@ import { PlansHistoryView } from '@/views/PlansHistoryView';
 import { PlanWorkspaceView } from '@/views/PlanWorkspaceView';
 import { DatosBasicosView } from '@/views/plans/DatosBasicosView';
 import { PresentacionView } from '@/views/plans/PresentacionView';
+import { MapaView } from '@/views/MapaView';
 //INTEGRANTES
 import { IntegrantesCreateView, IntegrantesEditView, IntegrantesView } from '@/views/plans/Integrantes';
 //Mascotas
@@ -30,6 +31,7 @@ export const protectedRoutes = [
       { path: "/dashboard", element: <DashboardView /> },
       { path: "/dashboard/contacts", element: <ContactsView /> },
       { path: "/dashboard/settings", element: <SettingsView /> },
+      { path: "/dashboard/mapa", element: <MapaView />},
 
       // --- Nuevas Rutas de Gestión de Planes ---
       { 
