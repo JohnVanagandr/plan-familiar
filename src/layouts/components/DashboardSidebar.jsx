@@ -14,7 +14,8 @@ import {
   MessageCircleQuestion,
   Flag,
   ShieldPlus,
-  Landmark
+  Landmark,
+  UsersRound
 } from 'lucide-react';
 import { Badge, Button } from '@/components/ui';
 
@@ -246,6 +247,25 @@ export const DashboardSidebar = ({
                       className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
                     >
                       Mapa
+                    </span>
+                  </>
+                )}
+              </NavLink>
+
+              <NavLink
+                to="/peticiones-acceso"
+                title="Peticiones de Acceso"
+                className={navLinkClasses}
+              >
+                {({ isActive }) => (
+                  <>
+                    <UsersRound
+                      className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                    />
+                    <span
+                      className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                    >
+                      Peticiones de Acceso
                     </span>
                   </>
                 )}
