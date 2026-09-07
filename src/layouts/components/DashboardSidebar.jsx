@@ -7,7 +7,14 @@ import {
   Hospital,
   ScanBox,
   Send,
-  Map
+  Map,
+  Building,
+  Building2,
+  IdCard,
+  MessageCircleQuestion,
+  Flag,
+  ShieldPlus,
+  Landmark
 } from 'lucide-react';
 import { Badge, Button } from '@/components/ui';
 
@@ -22,9 +29,6 @@ export const DashboardSidebar = ({
 
   // Detección segura del workspace del plan mediante segmentos de URL
   const pathSegments = location.pathname.split('/');
-  // const isPlansRoute = pathSegments[1] === 'dashboard' && pathSegments[2] === 'plans';
-  // const currentPlanId = isPlansRoute && pathSegments[3] && pathSegments[3] !== 'new' ? pathSegments[3] : null;
-  // const isInPlanWorkspace = Boolean(currentPlanId);
 
   // Buscamos el índice exacto donde aparece 'planes-familiares' dentro de la URL
   const plansIndex = pathSegments.findIndex(segment => segment === 'planes-familiares');
@@ -43,8 +47,17 @@ export const DashboardSidebar = ({
 
   // Reconstruimos la ruta base dinámica del plan (ej: "/planes-familiares/1" o "/dashboard/planes-familiares/1")
   const planBasePath = isPlansRoute 
-    ? `/${pathSegments.slice(0, plansIndex + 2).join('/')}` 
+    ? pathSegments.slice(0, plansIndex + 2).join('/')
     : '/planes-familiares';
+
+  // Detectamos si estamos dentro de la sección de Datos Maestros
+  const isInDatosMaestros = pathSegments.includes('datos-maestros');
+
+  // Reconstruimos la ruta base hasta 'datos-maestros' inclusive (ej: "/dashboard/datos-maestros")
+  const datosMaestrosIndex = pathSegments.findIndex(segment => segment === 'datos-maestros');
+  const datosMaestrosBasePath = isInDatosMaestros
+    ? pathSegments.slice(0, datosMaestrosIndex + 1).join('/') 
+    : '/datos-maestros';
 
   // Clases dinámicas con indicador visual de acento institucional (#FF6600)
   const navLinkClasses = ({ isActive }) => `
@@ -59,7 +72,7 @@ export const DashboardSidebar = ({
     }
   `;
 
-  // Los 9 módulos de administración secundaria del plan
+  // Los 10 módulos de administración secundaria del plan
   const planWorkspaceModules = [
     { label: "Prensentación", path: "", icon: Home },
     { label: "Datos Básicos", path: "datos-basicos", icon: FileText },
@@ -73,6 +86,24 @@ export const DashboardSidebar = ({
     { label: "Plan de Acción", path: "plan-accion", icon: ListOrdered },
   ];
 
+  // Los 14 catálogos de Datos Maestros
+  const datosMaestros = [
+    { label: "Datos Maestros", path: "", icon: Users },
+    { label: "Seccionales", path: "seccionales", icon: Building },
+    { label: "Organizaciones", path: "organizaciones", icon: Building2 },
+    { label: "Tipos de Documento", path: "tipos-documento", icon: IdCard },
+    { label: "Calidades de Vivienda", path: "calidades-vivienda", icon: Home },
+    { label: "Sectores", path: "sectores", icon: MapPin },
+    { label: "Preguntas de Vulnerabilidad", path: "preguntas-vulnerabilidad", icon: MessageCircleQuestion },
+    { label: "Nacionalidades", path: "nacionalidades", icon: Flag },
+    { label: "Tipos de Amenaza", path: "tipos-amenaza", icon: AlertTriangle },
+    { label: "Especies", path: "especies", icon: PawPrint },
+    { label: "Recursos", path: "recursos", icon: Hospital },
+    { label: "Vulnerabilidades", path: "vulnerabilidades", icon: ShieldPlus },
+    { label: "Ciudades", path: "ciudades", icon: Landmark },
+    { label: "Departamentos", path: "departamentos", icon: Map },
+  ];
+
   return (
     <aside
       className={`p-5 fixed lg:static inset-y-0 left-0 z-40 flex flex-col transform transition-all duration-300 ease-in-out shrink-0
@@ -82,9 +113,6 @@ export const DashboardSidebar = ({
     >
 
       <div className="bg-white h-full min-h-100 max-h-250 rounded-3xl p-5 flex flex-col gap-3 overflow-hidden">
-
-        {/* Luz ambiental sutil */}
-        {/* <div className="absolute top-0 right-0 w-32 h-32 bg-(--color_naranja) rounded-full blur-3xl opacity-10 pointer-events-none"></div> */}
 
         {/* Cabecera del Sidebar */}
         <div
@@ -100,7 +128,6 @@ export const DashboardSidebar = ({
 
             <span className="size-1.5 rounded-full bg-(--color_naranja) inline-block shrink-0"></span>
             <div className="text-nowrap font-extrabold tracking-tight mt-1 text-(--color_azul) flex flex-col items-left truncate">
-              {/* {isInPlanWorkspace ? "Workspace" : "PLAN FAMILIAR DE EMERGENCIA"} */}
               <h2 className='text-xs'>PLAN FAMILIAR DE</h2>
               <h2 className='text-lg text-(--color_naranja)'>EMERGENCIA</h2>
             </div>
@@ -140,15 +167,11 @@ export const DashboardSidebar = ({
 
         {/* Navegación Condicional */}
         <nav className={`flex-1 space-y-1.5 relative z-10 overflow-y-auto overflow-x-hidden
-          [&::-webkit-scrollbar]:h-2
-          [&::-webkit-scrollbar]:w-1
-          [&::-webkit-scrollbar-track]:rounded-full
-          [&::-webkit-scrollbar-track]:bg-scrollbar-track
-          [&::-webkit-scrollbar-thumb]:rounded-full
-          [&::-webkit-scrollbar-thumb]:bg-(--color_azul)
-          ${isInPlanWorkspace ? "rounded-4xl" : "rounded-0"}
+          [scrollbar-width:none]
+          [&::-webkit-scrollbar]:hidden
+          ${(isInPlanWorkspace || isInDatosMaestros) ? "rounded-4xl" : "rounded-0"}
         `}>
-          {!isInPlanWorkspace ? (
+          {!isInPlanWorkspace && !isInDatosMaestros ? (
             // --- MENÚ DE NAVEGACIÓN GLOBAL ---
             <>
               <NavLink
@@ -160,10 +183,10 @@ export const DashboardSidebar = ({
                 {({ isActive }) => (
                   <>
                     <LayoutDashboard
-                      className={`translate-x-1 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                      className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
                     />
                     <span
-                      className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                      className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
                     >
                       Panel Principal
                     </span>
@@ -198,10 +221,10 @@ export const DashboardSidebar = ({
                 {({ isActive }) => (
                   <>
                     <PhoneCall
-                      className={`translate-x-1 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                      className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
                     />
                     <span
-                      className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                      className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
                     >
                       Contactos Operativos
                     </span>
@@ -211,27 +234,45 @@ export const DashboardSidebar = ({
 
               <NavLink
                 to="/dashboard/mapa"
-                title="Contactos Operativos"
+                title="Mapa"
                 className={navLinkClasses}
               >
                 {({ isActive }) => (
                   <>
                     <Map
-                      className={`translate-x-1 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                      className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
                     />
                     <span
-                      className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                      className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
                     >
                       Mapa
                     </span>
                   </>
                 )}
               </NavLink>
+
+              <NavLink
+                to="/datos-maestros"
+                title="Datos Maestros"
+                className={navLinkClasses}
+              >
+                {({ isActive }) => (
+                  <>
+                    <Building
+                      className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                    />
+                    <span
+                      className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                    >
+                      Datos Maestros
+                    </span>
+                  </>
+                )}
+              </NavLink>
             </>
-          ) : (
-            // --- NAVEGACIÓN SECUNDARIA (LOS 9 MÓDULOS DE ADMINISTRACIÓN) ---
+          ) : isInPlanWorkspace ? (
+            // --- NAVEGACIÓN SECUNDARIA (LOS 10 MÓDULOS DEL PLAN) ---
             <div className="space-y-1.5 bg-(--color_azul)/5 p-1.5 w-full rounded-4xl">
-              {/* BOTÓN DE RETORNO AL HISTORIAL USANDO EL COMPONENTE UI <Button /> */}
               <div className="mb-2 flex justify-center">
                 <Button
                   variant="sidebar"
@@ -261,7 +302,7 @@ export const DashboardSidebar = ({
 
               {planWorkspaceModules.map((module, idx) => {
                 const Icon = module.icon;
-                const targetPath = `/planes-familiares/${currentPlanId}/${module.path}`;
+                const targetPath = `${planBasePath}${module.path ? `/${module.path}` : ""}`;
 
                 return (
                   <NavLink
@@ -303,6 +344,64 @@ export const DashboardSidebar = ({
                   </span>
                 </Button>
               </div>
+            </div>
+          ) : (
+            // --- NAVEGACIÓN SECUNDARIA (LOS 14 CATÁLOGOS DE DATOS MAESTROS) ---
+            <div className="space-y-1.5 bg-(--color_azul)/5 p-1.5 w-full rounded-4xl">
+              <div className="mb-2 flex justify-center">
+                <Button
+                  variant="sidebar"
+                  size="sm"
+                  className={`h-12 w-full justify-start transition-all duration-300 ${
+                    isDesktopCollapsed
+                      ? "lg:justify-center lg:w-12 lg:h-12 lg:p-0"
+                      : "px-4 py-2.5"
+                  }`}
+                  onClick={() => navigate("/dashboard")}
+                  title="Regresar al panel principal"
+                >
+                  <ArrowLeft className="w-4 h-4 shrink-0 translate-x-1" />
+                  <span
+                    className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                  >
+                    Volver al Panel
+                  </span>
+                </Button>
+              </div>
+
+              {!isDesktopCollapsed && (
+                <div className="px-4 py-1 text-[10px] uppercase font-extrabold tracking-wider text-slate-400 text-nowrap">
+                  Catálogos
+                </div>
+              )}
+
+              {datosMaestros.map((modulo, idx) => {
+                const Icon = modulo.icon;
+                const targetPath = `${datosMaestrosBasePath}${modulo.path ? `/${modulo.path}` : ""}`;
+
+                return (
+                  <NavLink
+                    key={idx}
+                    to={targetPath}
+                    end={modulo.path === ""}
+                    title={modulo.label}
+                    className={navLinkClasses}
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <Icon
+                          className={`translate-x-2 w-4 h-4 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-200 group-hover:text-(--color_naranja)"}`}
+                        />
+                        <span
+                          className={`pl-2 overflow-hidden whitespace-nowrap transition-all duration-300 ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                        >
+                          {modulo.label}
+                        </span>
+                      </>
+                    )}
+                  </NavLink>
+                );
+              })}
             </div>
           )}
         </nav>
