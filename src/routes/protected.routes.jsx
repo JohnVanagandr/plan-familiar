@@ -21,8 +21,21 @@ import EntornoGraphicView from '@/views/plans/Entorno/EntornoGraphicView';
 import { HousingCreateView, HousingEditView, HousingGraphicView } from '@/views/plans/vivienda';
 import GeoreferenceView from '@/views/plans/georeferencia/GeoreferenceView';
 import PlanAccionView from '@/views/plans/plan_accion/PlanAccionView';
-import SeccionalesView from '@/views/datos_maestros/seccionales/SeccionalesView';
-import SeccionalDetailView from '@/views/datos_maestros/seccionales/SeccionalDetailView';
+
+import { SeccionalesView, SeccionalDetailView } from '@/views/datos_maestros/seccionales';
+import { OrganizacionDetailView, OrganizacionesView } from '@/views/datos_maestros/organizaciones';
+import { TipoDocumentoDetailView, TiposDocumentoView } from '@/views/datos_maestros/documentos';
+import { CalidadesViviendaView, CalidadViviendaDetailView } from '@/views/datos_maestros/calidades';
+import { SectorDetailView, SectoresView } from '@/views/datos_maestros/sectores';
+import { PreguntasVulnerabilidadView, PreguntaVulnerabilidadDetailView } from '@/views/datos_maestros/preguntas';
+import { NacionalidadDetailView, NacionalidadesView } from '@/views/datos_maestros/nacionalidades';
+import { TipoAmenazaDetailView, TiposAmenazaView } from '@/views/datos_maestros/amenazas';
+import { EspecieDetailView, EspeciesView } from '@/views/datos_maestros/especies';
+import { RecursoDetailView, RecursosView } from '@/views/datos_maestros/recursos';
+import { VulnerabilidadDetailView, VulnerabilidadesView } from '@/views/datos_maestros/vulnerabilidades';
+import { CiudadDetailView, CiudadesView } from '@/views/datos_maestros/ciudades';
+import { DepartamentoDetailView, DepartamentosView } from '@/views/datos_maestros/departamentos';
+import { DatosMaestrosView } from '@/views/datos_maestros/DatosMaestrosView';
 
 
 export const protectedRoutes = [
@@ -103,7 +116,7 @@ export const protectedRoutes = [
       {
         path: "/datos-maestros",
         children: [
-          { index: true, element: <div>Presentación a datos básicos</div> },
+          { index: true, element: <DatosMaestrosView/> },
       
           {
             path: "seccionales",
@@ -115,85 +128,85 @@ export const protectedRoutes = [
           {
             path: "organizaciones",
             children: [
-              { index: true, element: <div>listado de organizaciones</div> },
-              { path: ":idOrganizacion", element: <div>historial y edición de organización</div> },
+              { index: true, element: <OrganizacionesView /> },
+              { path: ":idOrganizacion", element: <OrganizacionDetailView /> },
             ],
           },
           {
             path: "tipos-documento",
             children: [
-              { index: true, element: <div>listado de tipos de documento</div> },
-              { path: ":idTipoDocumento", element: <div>historial y edición de tipo de documento</div> },
+              { index: true, element: <TiposDocumentoView /> },
+              { path: ":idTipoDocumento", element: <TipoDocumentoDetailView /> },
             ],
           },
           {
             path: "calidades-vivienda",
             children: [
-              { index: true, element: <div>listado de calidades de vivienda</div> },
-              { path: ":idCalidadVivienda", element: <div>historial y edición de calidad de vivienda</div> },
+              { index: true, element: <CalidadesViviendaView /> },
+              { path: ":idCalidadVivienda", element: <CalidadViviendaDetailView /> },
             ],
           },
           {
             path: "sectores",
             children: [
-              { index: true, element: <div>listado de sectores</div> },
-              { path: ":idSector", element: <div>historial y edición de sector</div> },
+              { index: true, element: <SectoresView /> },
+              { path: ":idSector", element: <SectorDetailView /> },
             ],
           },
           {
             path: "preguntas-vulnerabilidad",
             children: [
-              { index: true, element: <div>listado de preguntas de vulnerabilidad</div> },
-              { path: ":idPregunta", element: <div>historial y edición de pregunta de vulnerabilidad</div> },
+              { index: true, element: <PreguntasVulnerabilidadView /> },
+              { path: ":idPregunta", element: <PreguntaVulnerabilidadDetailView /> },
             ],
           },
           {
             path: "nacionalidades",
             children: [
-              { index: true, element: <div>listado de nacionalidades</div> },
-              { path: ":idNacionalidad", element: <div>historial y edición de nacionalidad</div> },
+              { index: true, element: <NacionalidadesView /> },
+              { path: ":idNacionalidad", element: <NacionalidadDetailView /> },
             ],
           },
           {
             path: "tipos-amenaza",
             children: [
-              { index: true, element: <div>listado de tipos de amenaza</div> },
-              { path: ":idTipoAmenaza", element: <div>historial y edición de tipo de amenaza</div> },
+              { index: true, element: <TiposAmenazaView /> },
+              { path: ":idTipoAmenaza", element: <TipoAmenazaDetailView /> },
             ],
           },
           {
             path: "especies",
             children: [
-              { index: true, element: <div>listado de especies</div> },
-              { path: ":idEspecie", element: <div>historial y edición de especie</div> },
+              { index: true, element: <EspeciesView /> },
+              { path: ":idEspecie", element: <EspecieDetailView /> },
             ],
           },
           {
             path: "recursos",
             children: [
-              { index: true, element: <div>listado de recursos</div> },
-              { path: ":idRecurso", element: <div>historial y edición de recurso</div> },
+              { index: true, element: <RecursosView /> },
+              { path: ":idRecurso", element: <RecursoDetailView /> },
             ],
           },
           {
             path: "vulnerabilidades",
             children: [
-              { index: true, element: <div>listado de vulnerabilidades</div> },
-              { path: ":idVulnerabilidad", element: <div>historial y edición de vulnerabilidad</div> },
+              { index: true, element: <VulnerabilidadesView /> },
+              { path: ":idVulnerabilidad", element: <VulnerabilidadDetailView /> },
             ],
           },
           {
             path: "ciudades",
             children: [
-              { index: true, element: <div>listado de ciudades</div> },
-              { path: ":idCiudad", element: <div>historial y edición de ciudad</div> },
+              { index: true, element: <CiudadesView /> },
+              { path: ":idCiudad", element: <CiudadDetailView /> },
             ],
           },
           {
             path: "departamentos",
             children: [
-              { index: true, element: <div>listado de departamentos</div> },
-              { path: ":idDepartamento", element: <div>historial y edición de departamento</div> },
+              { index: true, element: <DepartamentosView /> },
+              { path: ":idDepartamento", element: <DepartamentoDetailView /> },
             ],
           },
         ],

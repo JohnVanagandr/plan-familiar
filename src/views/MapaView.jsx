@@ -1,10 +1,10 @@
 import { useState, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { Card, Button, Input, Link } from "@/components/ui";
 import HeaderSection from "@/components/ui/headerSection";
-import { MapPin, Search, Locate, UsersRound } from "lucide-react";
+import { MapPin, Search, Locate, UsersRound, Radius } from "lucide-react";
 
 const iconFamilia = L.icon({
   iconUrl: "/svg/pinFamilia.svg",
@@ -47,7 +47,9 @@ export const MapaView = () => {
   const [lat, setLat] = useState("");
   const [lng, setLng] = useState("");
   const [errores, setErrores] = useState({});
+
   const [puntoBuscado, setPuntoBuscado] = useState(null);
+  const [radio, setRadio] = useState("");
 
   const validarCoordenadas = () => {
     const nuevosErrores = {};
@@ -64,7 +66,7 @@ export const MapaView = () => {
 
   const handleBuscar = () => {
     if (!validarCoordenadas()) return;
-    setPuntoBuscado({ lat: Number(lat), lng: Number(lng) });
+    setPuntoBuscado({ lat: Number(lat), lng: Number(lng), radio: Number(radio) });
   };
 
   return (
@@ -94,6 +96,15 @@ export const MapaView = () => {
             onChange={(e) => setLng(e.target.value)}
             error={errores.lng}
           />
+
+          <Input
+            icon={Radius}
+            type="text"
+            placeholder="Radio de búsqueda (ej. 1000)"
+            value={radio}
+            onChange={(e) => setRadio(e.target.value)}
+          />
+
           <Button variant="accent" onClick={handleBuscar} className="shrink-0">
             <Search className="size-5" /> Buscar punto
           </Button>
@@ -126,9 +137,17 @@ export const MapaView = () => {
           ))}
 
           {puntoBuscado && (
-            <Marker position={[puntoBuscado.lat, puntoBuscado.lng]} icon={iconBusqueda}>
-              <Popup>Punto buscado</Popup>
-            </Marker>
+            <>
+              <Marker position={[puntoBuscado.lat, puntoBuscado.lng]} icon={iconBusqueda}>
+                <Popup>Punto buscado</Popup>
+              </Marker>,
+              <Circle 
+                center={[puntoBuscado.lat, puntoBuscado.lng]}
+                radius={puntoBuscado.radio}
+                pathOptions={{ fillColor: "blue", fillOpacity: 0.3, }}
+              />
+            </>
+
           )}
         </MapContainer>
       </Card>

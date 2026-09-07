@@ -19,7 +19,7 @@ export const HeaderSection = ({
           {icon}
           {title}
         </h1>
-        {description && <p className="text-(--color_azul) text-start">{description}</p>}
+        {description && <p className="text-(--color_azul) text-start pb-4">{description}</p>}
       </div>
 
       {buttonSection && <Button className='absolute! right-2 top-2 lg:-top-5'>{buttonText}</Button>}
