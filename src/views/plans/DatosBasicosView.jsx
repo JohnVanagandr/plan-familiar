@@ -1,9 +1,3 @@
-// import { DatosPrincipalesForm } from '@/features/plans/components/DatosPrincipalesForm';
-
-// export const DatosBasicosView = () => {
-//   return <DatosPrincipalesForm />;
-// };
-
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Card, Button, Input, Select, Alert } from "@/components/ui";
@@ -28,23 +22,13 @@ const zonas = [
   { value: "2", label: "Urbana" },
 ];
 
-const sectores = [
-  { value: "1", label: "Barrio" },
-  { value: "2", label: "Comuna" },
-  { value: "3", label: "Localidad" },
-];
-
-const calidadesVivienda = [
-  { value: "1", label: "Propio" },
-  { value: "2", label: "Arrendado" },
-  { value: "3", label: "Familiar" },
-];
-
 export const DatosBasicosView = () => {
   const { planId } = useParams();
   const [familiaData, setFamiliaData] = useState(null);
   const [departamentos, setDepartamentos] = useState([]);
   const [ciudades, setCiudades] = useState([]);
+  const [sectores, setSectores] = useState([]);
+  const [calidadesVivienda, setCalidadesVivienda] = useState([]);
   const [loadingCiudades, setLoadingCiudades] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -69,9 +53,12 @@ export const DatosBasicosView = () => {
   useEffect(() => {
     const cargarPlan = async () => {
       try {
-        const [data, departmentsData] = await Promise.all([
+        const [data, departmentsData, sectoresData, calidadesData] = await Promise.all([
           api.get(`familyPlans/${planId}`),
           api.get("departments"),
+          api.get("sectors"),
+          api.get("housingQualities")
+
         ]);
 
         setFamiliaData(data);
@@ -81,6 +68,21 @@ export const DatosBasicosView = () => {
             label: department.name ?? department.nombre,
           }))
         );
+
+        setSectores(
+          (sectoresData ?? []).map((sector) => ({
+            value: String(sector.id),
+            label: sector.name ?? sector.nombre,
+          }))
+        );
+
+        setCalidadesVivienda(
+          (calidadesData ?? []).map((quality) => ({
+            value: String(quality.id),
+            label: quality.name ?? quality.nombre,
+          }))
+        );
+
         setValues({
           apellidos: data.last_names ?? "",
           zona: String(data.zone_id ?? ""),

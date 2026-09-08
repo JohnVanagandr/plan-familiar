@@ -1,4 +1,3 @@
-// helpers/api.js
 import * as cookie from "./cookies";
 
 const HOST = window.location.hostname;
@@ -62,13 +61,20 @@ const request = async (endpoint, { method = "GET", body, responseType = "json" }
 
   if (responseType === "none") return null;
   if (responseType === "blob") return response.ok ? response.blob() : null;
-  return response.json();
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    const error = new Error(data?.message || "Error en la petición");
+    error.code = data?.code ?? response.status;
+    error.details = data;
+    throw error;
+  }
+
+  return data;
 };
 
 // ============ Wrappers ============
-
-// export const get = (endpoint) => request(endpoint).then((r) => r.data);
-// export const getPaginado = (endpoint) => request(endpoint).then((r) => ({ data: r.data, paginate: r.paginate }));
 
 export const get = async (endpoint) => {
   const r = await request(endpoint);

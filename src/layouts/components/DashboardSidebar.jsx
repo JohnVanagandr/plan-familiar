@@ -189,10 +189,10 @@ export const DashboardSidebar = ({
                 {({ isActive }) => (
                   <>
                     <LayoutDashboard
-                      className={`translate-x-1 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                      className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
                     />
                     <span
-                      className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                      className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
                     >
                       Panel Principal
                     </span>
@@ -227,10 +227,10 @@ export const DashboardSidebar = ({
                 {({ isActive }) => (
                   <>
                     <PhoneCall
-                      className={`translate-x-1 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                      className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
                     />
                     <span
-                      className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                      className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
                     >
                       Contactos Operativos
                     </span>
@@ -248,10 +248,10 @@ export const DashboardSidebar = ({
                   {({ isActive }) => (
                     <>
                       <Map
-                        className={`translate-x-1 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                        className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
                       />
                       <span
-                        className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                        className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
                       >
                         Mapa
                       </span>
@@ -270,17 +270,17 @@ export const DashboardSidebar = ({
                   {({ isActive }) => (
                     <>
                       <Building
-                        className={`translate-x-1 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                        className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
                       />
                       <span
-                        className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                        className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
                       >
                         Datos Maestros
                       </span>
                     </>
                   )}
                 </NavLink>
-              )};
+              )}
               
             </>
           ) : isInPlanWorkspace ? (

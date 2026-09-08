@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, Button, Input, Select, Alert } from "@/components/ui";
 import HeaderSection from "@/components/ui/headerSection";
@@ -17,45 +17,61 @@ import {
 } from "lucide-react";
 import { useFormValidation } from "@/features/auth/hooks/useFormValidation.js";
 import { memberSchema } from "@/features/plans/schemas/member.schema"; // Ajusta según tu esquema
+import * as api from "@/helpers/api";
+import { set } from "zod";
+import { tr } from "zod/v4/locales";
 
 export const CrearView = () => {
-  const { id } = useParams();
+  const { planId } = useParams();
   const navigate = useNavigate();
 
-  // Opciones estáticas para maquetación visual
-  const tiposDocumento = [
-    { value: "1", label: "Cédula de Ciudadanía" },
-    { value: "2", label: "Tarjeta de Identidad" },
-    { value: "3", label: "Registro Civil" },
-  ];
 
-  const generos = [
-    { value: "1", label: "Masculino" },
-    { value: "2", label: "Femenino" },
-  ];
+  const [tiposDocumento, setTiposDocumento] = useState([]);
+  const [generos, setGeneros] = useState([]);
+  const [parentescos, setParentescos] = useState([]);
+  const [gruposSanguineos, setGruposSanguineos] = useState([]);
+  const [nacionalidades, setNacionalidades] = useState([]);
+  const [eps, setEps] = useState([]);
 
-  const parentescos = [
-    { value: "1", label: "Cabeza de familia" },
-    { value: "2", label: "Cónyuge" },
-    { value: "4", label: "Hijo/a" },
-  ];
+  useEffect(() => {
+    const cargarCatalogos = async () => {
+      try {
+        const [tiposDoc, generosData, parentescosData, gruposSanguineosData, nacionalidadesData, epsData] = await Promise.all([
+          api.get("documentTypes"),
+          api.get("genders"),
+          api.get("kinships"),
+          api.get("bloodGroups"),
+          api.get("nationalities"),
+          api.get("eps")
+        ]);
 
-  const gruposSanguineos = [
-    { value: "1", label: "A+" },
-    { value: "3", label: "B+" },
-    { value: "7", label: "O+" },
-  ];
+        setTiposDocumento(
+          (tiposDoc || []).map((item) => ({ value: item.id, label: item.name }))
+        );
+        setGeneros(
+          (generosData || []).map((item) => ({ value: item.id, label: item.name }))
+        );
+        setParentescos(
+          (parentescosData || []).map((item) => ({ value: item.id, label: item.name }))
+        );
+        setGruposSanguineos(
+          (gruposSanguineosData || []).map((item) => ({ value: item.id, label: item.name }))
+        );
+        setNacionalidades(
+          (nacionalidadesData || []).map((item) => ({ value: item.id, label: item.name }))
+        );
+        setEps(
+          (epsData || []).map((item) => ({ value: item.id, label: item.name }))
+        );
 
-  const nacionalidades = [
-    { value: "1", label: "Colombiana" },
-    { value: "2", label: "Venezolana" },
-  ];
+      }
+      catch (error) {
+        console.error("Error al cargar los catálogos:", error);
+      }
+    };
 
-  const eps = [
-    { value: "1", label: "Sura" },
-    { value: "2", label: "Sanitas" },
-    { value: "3", label: "Salud Total" },
-  ];
+    cargarCatalogos();
+  }, []);
 
   const initialValues = {
     nombres: "",
@@ -84,24 +100,44 @@ export const CrearView = () => {
     onCancel: () => {},
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (validate()) {
+    if (!validate()) {
+      console.warn("El formulario tiene errores de validación que deben corregirse.");
+      return;
+    }
+
+    try {
+      const responce = await api.post(`members/${planId}`, {
+        names: values.nombres,
+        last_names: values.apellidos,
+        document_type_id: values.tipoDocumento,
+        document_number: values.numeroDocumento,
+        gender_id: values.genero,
+        birth_date: values.nacimiento,
+        eps_id: values.eps,
+        kinship_id: values.parentesco,
+        blood_group_id: values.grupoSanguineo,
+        nationality_id: values.nacionalidad,
+        phone: values.celularPersonal,
+      });
+
       setAlertConfig({
         isVisible: true,
         variant: "yesno",
         text: "¿Deseas agregar enfermedades o afecciones que padezca el integrante?",
         onConfirm: () => {
           setAlertConfig((prev) => ({ ...prev, isVisible: false }));
-          navigate(`/planes-familiares/${id}/integrantes/1/editar`);
+          navigate(`/planes-familiares/${planId}/integrantes/${responce.id}/editar`);
         },
         onCancel: () => {
-          navigate(`/planes-familiares/${id}/integrantes`);
+          navigate(`/planes-familiares/${planId}/integrantes`);
         },
       });
-    } else {
-      console.warn("El formulario contiene errores de validación.");
+
+    } catch (error) {
+      console.error("Error al guardar el integrante:", error);
     }
   };
 
