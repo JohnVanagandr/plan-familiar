@@ -100,7 +100,10 @@ const LoginRegisterView = () => {
     }
 
     try {
-      const resultado = await api.post("/login", values);
+      const resultado = await api.post("login", {
+        email: values.correo,
+        password: values.contrasena,
+      });
       const atributos = resultado?.data ?? resultado;
 
       if (!atributos || (!atributos.token && !atributos.access_token)) {
@@ -140,7 +143,7 @@ const LoginRegisterView = () => {
     }
 
     try {
-      await api.post("/register", registerValues);
+      await api.post("register", registerValues);
       setAlertMessage("¡Usuario registrado con éxito!");
       setShowToast(true);
       resetRegisterForm();

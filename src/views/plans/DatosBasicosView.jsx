@@ -4,9 +4,10 @@
 //   return <DatosPrincipalesForm />;
 // };
 
-import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { Card, Button, Input, Select, Alert } from "@/components/ui";
+import * as api from "@/helpers/api";
 import {
   FileEdit,
   UserRound,
@@ -21,37 +22,10 @@ import {
 import { useFormValidation } from "@/features/auth/hooks/useFormValidation.js";
 import { familyDatosSchema } from "@/features/plans/schemas/familyDatos.schema";
 
-// Mock: reemplazar por la petición real (GET /familyPlans/:id) cuando se reconecte la lógica
-const familiaMock = {
-  id: 12,
-  last_names: "García Pérez",
-  zone_id: "2",
-  department_id: "1",
-  city_id: "1",
-  address: "Calle 45 #12-34",
-  // sector_id: "1",
-  // sector_name: "La Esperanza",
-  // landline_phone: "6017894561",
-  housing_quality_id: "1",
-  familyType: { name: "Vulnerable" },
-};
-
-// Mock: reemplazar por catálogos reales cuando se reconecte la lógica
+// Reemplazar por catálogos de la API cuando estén disponibles.
 const zonas = [
   { value: "1", label: "Rural" },
   { value: "2", label: "Urbana" },
-];
-
-const departamentos = [
-  { value: "1", label: "Santander" },
-  { value: "2", label: "Cundinamarca" },
-  { value: "3", label: "Antioquia" },
-];
-
-const ciudades = [
-  { value: "1", label: "Bucaramanga" },
-  { value: "2", label: "Girón" },
-  { value: "3", label: "Floridablanca" },
 ];
 
 const sectores = [
@@ -67,42 +41,144 @@ const calidadesVivienda = [
 ];
 
 export const DatosBasicosView = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const { planId } = useParams();
+  const [familiaData, setFamiliaData] = useState(null);
+  const [departamentos, setDepartamentos] = useState([]);
+  const [ciudades, setCiudades] = useState([]);
+  const [loadingCiudades, setLoadingCiudades] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Mock: en un futuro esto vendría de buscar familiaMock por `id` (useParams) contra la API real
-  const familiaData = familiaMock;
-
-  const initial_state = {
-    apellidos: familiaData.last_names ?? "",
-    zona: familiaData.zone_id ?? "",
-    departamento: familiaData.department_id ?? "",
-    ciudad: familiaData.city_id ?? "",
-    direccion: familiaData.address ?? "",
-    sector: familiaData.sector_id ?? "",
-    sectorNombre: familiaData.sector_name ?? "",
-    telefono: familiaData.landline_phone ?? "",
-    calidadVivienda: familiaData.housing_quality_id ?? "",
+  const initialState = {
+    apellidos: "",
+    zona: "",
+    departamento: "",
+    ciudad: "",
+    direccion: "",
+    sector: "",
+    sectorNombre: "",
+    telefono: "",
+    calidadVivienda: "",
   };
 
-  const { values, errors, handleChange, validate } = useFormValidation(initial_state, familyDatosSchema);
+  const { values, errors, handleChange, validate, setValues } = useFormValidation(initialState, familyDatosSchema);
 
   const [showToast, setShowToast] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertVariant, setAlertVariant] = useState("success");
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    const cargarPlan = async () => {
+      try {
+        const [data, departmentsData] = await Promise.all([
+          api.get(`familyPlans/${planId}`),
+          api.get("departments"),
+        ]);
+
+        setFamiliaData(data);
+        setDepartamentos(
+          (departmentsData ?? []).map((department) => ({
+            value: String(department.id),
+            label: department.name ?? department.nombre,
+          }))
+        );
+        setValues({
+          apellidos: data.last_names ?? "",
+          zona: String(data.zone_id ?? ""),
+          departamento: String(data.department_id ?? ""),
+          ciudad: String(data.city_id ?? ""),
+          direccion: data.address ?? "",
+          sector: String(data.sector_id ?? ""),
+          sectorNombre: data.sector_name ?? "",
+          telefono: data.landline_phone ?? "",
+          calidadVivienda: String(data.housing_quality_id ?? ""),
+        });
+      } catch (error) {
+        console.error("Error cargando el plan:", error);
+        setAlertVariant("danger");
+        setAlertMessage("No se pudieron cargar los datos del plan.");
+        setShowToast(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (planId) cargarPlan();
+  }, [planId, setValues]);
+
+  useEffect(() => {
+    const cargarCiudades = async () => {
+      if (!values.departamento) {
+        setCiudades([]);
+        return;
+      }
+
+      setLoadingCiudades(true);
+
+      try {
+        const data = await api.get(`cities/department/${values.departamento}`);
+        setCiudades(
+          (data ?? []).map((city) => ({
+            value: String(city.id),
+            label: city.name ?? city.nombre,
+          }))
+        );
+      } catch (error) {
+        console.error("Error cargando ciudades:", error);
+        setCiudades([]);
+        setAlertVariant("danger");
+        setAlertMessage("No se pudieron cargar las ciudades.");
+        setShowToast(true);
+      } finally {
+        setLoadingCiudades(false);
+      }
+    };
+
+    cargarCiudades();
+  }, [values.departamento]);
+
+  const handleDepartamentoChange = (event) => {
+    handleChange(event);
+    setValues((previous) => ({ ...previous, ciudad: "" }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (validate()) {
-      // Mock: PATCH real
+    if (!validate()) {
+      console.warn("El formulario tiene errores de validación que deben corregirse.");
+      return;
+    }
+
+    try {
+      await api.patch(`familyPlans/${planId}`, {
+        last_names: values.apellidos,
+        zone_id: values.zona,
+        department_id: values.departamento,
+        city_id: values.ciudad,
+        address: values.direccion,
+        sector_id: values.sector,
+        sector_name: values.sectorNombre,
+        landline_phone: values.telefono,
+        housing_quality_id: values.calidadVivienda,
+      });
       setAlertVariant("success");
       setAlertMessage("Datos actualizados con éxito.");
       setShowToast(true);
-    } else {
-      console.warn("El formulario tiene errores de validación que deben corregirse.");
+    } catch (error) {
+      console.error("Error actualizando el plan:", error);
+      setAlertVariant("danger");
+      setAlertMessage("No se pudieron actualizar los datos del plan.");
+      setShowToast(true);
     }
   };
+
+  if (loading) {
+    return <p className="text-(--color_azul)">Cargando datos del plan...</p>;
+  }
+
+  if (!familiaData) {
+    return <p className="text-(--color_azul)">No se encontró el plan familiar.</p>;
+  }
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row">
@@ -154,7 +230,7 @@ export const DatosBasicosView = () => {
             placeholder="Seleccione el departamento"
             name="departamento"
             value={values.departamento}
-            onChange={handleChange}
+            onChange={handleDepartamentoChange}
             arrayOptions={departamentos}
             error={errors.departamento}
           />
@@ -166,6 +242,7 @@ export const DatosBasicosView = () => {
             value={values.ciudad}
             onChange={handleChange}
             arrayOptions={ciudades}
+            disabled={!values.departamento || loadingCiudades}
             error={errors.ciudad}
           />
 

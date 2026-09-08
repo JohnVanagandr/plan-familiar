@@ -9,7 +9,7 @@ export const DashboardView = () => {
       return (
         <>
             {rol === "Administrador" && <AdminDashboard />}
-            {rol === "supervisor" && <SupervisorDashboard />}
+            {rol === "Supervisor" && <SupervisorDashboard />}
             {rol === "voluntario" && <VoluntarioDashboard />}
         </>
     );

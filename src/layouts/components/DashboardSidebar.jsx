@@ -14,8 +14,7 @@ import {
   MessageCircleQuestion,
   Flag,
   ShieldPlus,
-  Landmark,
-  UsersRound
+  Landmark
 } from 'lucide-react';
 import { Badge, Button } from '@/components/ui';
 
@@ -27,6 +26,8 @@ export const DashboardSidebar = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const rol = localStorage.getItem("rol");
 
   // Detección segura del workspace del plan mediante segmentos de URL
   const pathSegments = location.pathname.split('/');
@@ -43,7 +44,7 @@ export const DashboardSidebar = ({
   // Validamos que el ID exista y no sea una subruta fija de creación como "new"
   const currentPlanId = possiblePlanId && possiblePlanId !== 'new' ? possiblePlanId : null;
   
-  // Si encontramos un ID válido, se activan los 10 módulos del plan
+  // Si encontramos un ID válido, se activan los 10 módulos del planW
   const isInPlanWorkspace = Boolean(currentPlanId);
 
   // Reconstruimos la ruta base dinámica del plan (ej: "/planes-familiares/1" o "/dashboard/planes-familiares/1")
@@ -168,8 +169,12 @@ export const DashboardSidebar = ({
 
         {/* Navegación Condicional */}
         <nav className={`flex-1 space-y-1.5 relative z-10 overflow-y-auto overflow-x-hidden
-          [scrollbar-width:none]
-          [&::-webkit-scrollbar]:hidden
+          [&::-webkit-scrollbar]:h-2
+          [&::-webkit-scrollbar]:w-1
+          [&::-webkit-scrollbar-track]:rounded-full
+          [&::-webkit-scrollbar-track]:bg-scrollbar-track
+          [&::-webkit-scrollbar-thumb]:rounded-full
+          [&::-webkit-scrollbar-thumb]:bg-(--color_azul)
           ${(isInPlanWorkspace || isInDatosMaestros) ? "rounded-4xl" : "rounded-0"}
         `}>
           {!isInPlanWorkspace && !isInDatosMaestros ? (
@@ -184,10 +189,10 @@ export const DashboardSidebar = ({
                 {({ isActive }) => (
                   <>
                     <LayoutDashboard
-                      className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                      className={`translate-x-1 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
                     />
                     <span
-                      className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                      className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
                     >
                       Panel Principal
                     </span>
@@ -222,10 +227,10 @@ export const DashboardSidebar = ({
                 {({ isActive }) => (
                   <>
                     <PhoneCall
-                      className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                      className={`translate-x-1 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
                     />
                     <span
-                      className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                      className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
                     >
                       Contactos Operativos
                     </span>
@@ -233,62 +238,50 @@ export const DashboardSidebar = ({
                 )}
               </NavLink>
 
-              <NavLink
-                to="/dashboard/mapa"
-                title="Mapa"
-                className={navLinkClasses}
-              >
-                {({ isActive }) => (
-                  <>
-                    <Map
-                      className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
-                    />
-                    <span
-                      className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
-                    >
-                      Mapa
-                    </span>
-                  </>
-                )}
-              </NavLink>
+              {rol === "Supervisor" && (
 
-              <NavLink
-                to="/peticiones-acceso"
-                title="Peticiones de Acceso"
-                className={navLinkClasses}
-              >
-                {({ isActive }) => (
-                  <>
-                    <UsersRound
-                      className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
-                    />
-                    <span
-                      className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
-                    >
-                      Peticiones de Acceso
-                    </span>
-                  </>
-                )}
-              </NavLink>
+                <NavLink
+                  to="/dashboard/mapa"
+                  title="Mapa"
+                  className={navLinkClasses}
+                >
+                  {({ isActive }) => (
+                    <>
+                      <Map
+                        className={`translate-x-1 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                      />
+                      <span
+                        className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                      >
+                        Mapa
+                      </span>
+                    </>
+                  )}
+                </NavLink>
+              )}
 
-              <NavLink
-                to="/datos-maestros"
-                title="Datos Maestros"
-                className={navLinkClasses}
-              >
-                {({ isActive }) => (
-                  <>
-                    <Building
-                      className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
-                    />
-                    <span
-                      className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
-                    >
-                      Datos Maestros
-                    </span>
-                  </>
-                )}
-              </NavLink>
+              {rol === "Administrador" && (
+
+                <NavLink
+                  to="/datos-maestros"
+                  title="Datos Maestros"
+                  className={navLinkClasses}
+                >
+                  {({ isActive }) => (
+                    <>
+                      <Building
+                        className={`translate-x-1 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                      />
+                      <span
+                        className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                      >
+                        Datos Maestros
+                      </span>
+                    </>
+                  )}
+                </NavLink>
+              )};
+              
             </>
           ) : isInPlanWorkspace ? (
             // --- NAVEGACIÓN SECUNDARIA (LOS 10 MÓDULOS DEL PLAN) ---
