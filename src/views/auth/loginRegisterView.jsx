@@ -6,7 +6,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useFormValidation } from "@/features/auth/hooks/useFormValidation.js";
 import { Select } from "@/components/ui/Select.jsx";
 import { Button, Input, Link } from '@/components/ui'; 
-import { Building2, Calendar, CircleCheckBig, Hash, IdCard, Lock, Mail, MapPin, Phone, UserRound, VenusAndMars } from "lucide-react";
+import { Building2, Calendar, Hash, IdCard, Lock, Mail, MapPin, Phone, UserRound, VenusAndMars } from "lucide-react";
+import * as api from "@/helpers/api";
 
 const initial_state = { correo: "", contrasena: "" };
 
@@ -90,34 +91,67 @@ const LoginRegisterView = () => {
     }, 500);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (validate()) {
+    if (!validate()) {
+      console.warn("El formulario tiene errores de validación que deben corregirse.");
+      return;
+    }
+
+    try {
+      const resultado = await api.post("login", {
+        email: values.correo,
+        password: values.contrasena,
+      });
+      const atributos = resultado?.data ?? resultado;
+
+      if (!atributos || (!atributos.token && !atributos.access_token)) {
+        throw new Error("Respuesta inválida del servidor");
+      }
+
+      const token = atributos.token ?? atributos.access_token;
+
       localStorage.setItem("auth", "auth");
-      localStorage.setItem("rol", "voluntario");
-      // localStorage.setItem("rol", "supervisor");
-      // localStorage.setItem("rol", "administrador");
+      localStorage.setItem("rol", atributos.role ?? "voluntario");
+      localStorage.setItem("full_name", atributos.full_name ?? "");
+      localStorage.setItem("id", atributos.id ?? "");
+      localStorage.setItem("permissions", JSON.stringify(atributos.permissions ?? []));
+      localStorage.setItem("role_id", atributos.role_id ?? "");
+      localStorage.setItem("sectional_id", atributos.sectional_id ?? "");
+      localStorage.setItem("gender_id", atributos.gender ?? "");
+      localStorage.setItem("access_token", token ?? "");
+      localStorage.setItem("refresh_token", atributos.refresh_token ?? "");
 
       setShowToast(true);
       setAlertMessage("¡Sesión iniciada con éxito!");
       resetForm();
       handleNavigateWithFade("/dashboard");
-    } else {
-      console.warn("El formulario tiene errores de validación que deben corregirse.");
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error);
+      setShowToast(true);
+      setAlertMessage("Credenciales inválidas o error del servidor");
     }
   };
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
 
-    if (validateRegister()) {
+    if (!validateRegister()) {
+      console.warn("Errores de validación:", registerErrors);
+      return;
+    }
+
+    try {
+      await api.post("register", registerValues);
       setAlertMessage("¡Usuario registrado con éxito!");
       setShowToast(true);
       resetRegisterForm();
       navigate("/login");
-    } else {
-      console.warn("Errores de validación:", registerErrors);
+    } catch (error) {
+      console.error("Error al registrar usuario:", error);
+      setAlertMessage("No se pudo registrar el usuario");
+      setShowToast(true);
     }
   };
 

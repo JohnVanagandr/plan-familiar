@@ -36,6 +36,8 @@ import { VulnerabilidadDetailView, VulnerabilidadesView } from '@/views/datos_ma
 import { CiudadDetailView, CiudadesView } from '@/views/datos_maestros/ciudades';
 import { DepartamentoDetailView, DepartamentosView } from '@/views/datos_maestros/departamentos';
 import { DatosMaestrosView } from '@/views/datos_maestros/DatosMaestrosView';
+import PeticionesAccesoView from '@/views/usuarios/PeticionesAccesoView';
+import UsuarioDetailView from '@/views/usuarios/UsuarioDetailView';
 
 
 export const protectedRoutes = [
@@ -47,6 +49,22 @@ export const protectedRoutes = [
       { path: "/dashboard/contacts", element: <ContactsView /> },
       { path: "/dashboard/settings", element: <SettingsView /> },
       { path: "/dashboard/mapa", element: <MapaView />},
+
+      // Rutas de gestión de usuarios y peticiones de acceso, el Admin podra editar la información sencible si el voluntario o supervisor lo solicita
+      { path: "/gestion-usuarios",
+        children: [
+          { index: true, element: <div>Gestión de Usuarios</div> },
+          { path: ":usuarioId", element: <div>Detalle de Usuario</div> },
+        ]
+      },
+
+      // Peticiones de acceso tras el registro de usuario, para que un administrador o supervisor las apruebe o rechace
+      { path: "/peticiones-acceso",
+        children: [
+          { index: true, element: <PeticionesAccesoView /> },
+          { path: ":peticionId", element: <UsuarioDetailView /> },
+        ]
+      },
 
       // --- Rutas de Gestión de Planes ---
       { 
