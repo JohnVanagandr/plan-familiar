@@ -1,33 +1,57 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, Button, Input } from "@/components/ui";
 import HeaderSection from "@/components/ui/headerSection";
 import { MapPin, UploadCloud, Save, Locate } from "lucide-react";
-
-// Mock: reemplazar por la petición real (GET /housingInfo/plan/:id/type/1) cuando se reconecte la lógica
-const georefExistenteMock = {
-  path: "https://picsum.photos/seed/georef12/600/400",
-  latitud: "7.0631",
-  longitud: "-73.0864",
-};
+import * as api from "@/helpers/api";
 
 export const GeoreferenceView = () => {
   const { planId } = useParams();
   const navigate = useNavigate();
 
   const [imageFile, setImageFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(georefExistenteMock.path);
-
-  const [latitud, setLatitud] = useState(georefExistenteMock.latitud);
-  const [longitud, setLongitud] = useState(georefExistenteMock.longitud);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [imagenExiste, setImagenExiste] = useState(false);
+  const [coordinatesId, setCoordinatesId] = useState(null);
+  const [latitud, setLatitud] = useState("");
+  const [longitud, setLongitud] = useState("");
   const [errores, setErrores] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [guardando, setGuardando] = useState(false);
+
+  useEffect(() => {
+    const cargarGeoreferencia = async () => {
+      try {
+        const [georreferenciaData, coordinateData] = await Promise.all([
+          api.get(`housingInfo/${planId}/type/${1}`),
+          api.get(`coordinates/familyPlan/${planId}`),
+        ]);
+
+        if (georreferenciaData) {
+          setPreviewUrl(georreferenciaData.path ?? null);
+          setImagenExiste(true);
+        }
+
+        if (coordinateData) {
+          setCoordinatesId(coordinateData.id ?? null);
+          setLatitud(String(coordinateData.latitude ?? ""));
+          setLongitud(String(coordinateData.longitude ?? ""));
+        }
+      } catch (error) {
+        console.error("Error al cargar la georreferenciación:", error.details ?? error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarGeoreferencia();
+  }, [planId]);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
 
     if (!file) {
       setImageFile(null);
-      setPreviewUrl(georefExistenteMock.path);
       return;
     }
 
@@ -48,14 +72,54 @@ export const GeoreferenceView = () => {
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  const handleGuardar = () => {
+  const handleGuardar = async () => {
     if (!validarCoordenadas()) return;
 
-    // Mock: acá iría el PATCH real /housingInfo/plan/:id/type/1
-    // georeference se guarda como "latitud,longitud" según el modelo real (string único)
-    const georeference = `${latitud},${longitud}`;
-    console.log("Guardando georreferenciación (mock):", { planId, imageFile, georeference });
+    if (!imageFile && !imagenExiste) {
+      setErrores((prev) => ({ ...prev, imagen: "Selecciona un archivo primero" }));
+      return;
+    }
+
+    setGuardando(true);
+    try {
+      // 1. Imagen → housingInfo
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append("path", imageFile);
+        formData.append("family_plan_id", planId);
+        formData.append("housing_info_type_id", 1);
+
+        if (imagenExiste) {
+          await api.post(`housingInfo/${planId}/type/${1}`, formData);
+        } else {
+          await api.post(`housingInfo`, formData);
+          setImagenExiste(true);
+        }
+      }
+
+      // 2. Coordenadas → coordinates
+      const payloadCoordenadas = {
+        family_plan_id: planId,
+        latitude: latitud,
+        longitude: longitud,
+      };
+
+      if (coordinatesId) {
+        await api.put(`coordinates/${coordinatesId}`, payloadCoordenadas);
+      } else {
+        const nuevaCoordenada = await api.post(`coordinates`, payloadCoordenadas);
+        setCoordinatesId(nuevaCoordenada.id);
+      }
+    } catch (error) {
+      console.error("Error al guardar la georreferenciación:", error.details ?? error);
+    } finally {
+      setGuardando(false);
+    }
   };
+
+  if (loading) {
+    return <p className="text-(--color_azul)">Cargando georreferenciación...</p>;
+  }
 
   return (
     <div className="w-full flex flex-col gap-6">
@@ -70,7 +134,6 @@ export const GeoreferenceView = () => {
       />
 
       <Card padding="none" className="w-full p-5 sm:p-7 flex flex-col gap-5 items-center">
-
         <div className="w-full max-w-2xl h-72 rounded-2xl bg-(--color_azul)/10 overflow-hidden flex items-center justify-center">
           {previewUrl ? (
             <img src={previewUrl} alt="Vista previa de georreferenciación" className="w-full h-full object-cover" />
@@ -86,6 +149,7 @@ export const GeoreferenceView = () => {
           </span>
           <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
         </label>
+        {errores.imagen && <p className="text-sm text-red-500">{errores.imagen}</p>}
 
         <div className="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
@@ -107,8 +171,8 @@ export const GeoreferenceView = () => {
           />
         </div>
 
-        <Button variant="accent" size="lg" onClick={handleGuardar} className="w-full max-w-2xl">
-          <Save className="size-5" /> Guardar
+        <Button variant="accent" size="lg" onClick={handleGuardar} disabled={guardando} className="w-full max-w-2xl">
+          <Save className="size-5" /> {guardando ? "Guardando..." : "Guardar"}
         </Button>
       </Card>
     </div>

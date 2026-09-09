@@ -1,10 +1,11 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { Card, Button, Input, Link } from "@/components/ui";
 import HeaderSection from "@/components/ui/headerSection";
 import { MapPin, Search, Locate, UsersRound, Radius } from "lucide-react";
+import * as api from "@/helpers/api";
 
 const iconFamilia = L.icon({
   iconUrl: "/svg/pinFamilia.svg",
@@ -24,17 +25,6 @@ const colombiaBounds = [
   [13.5, -66.8],
 ];
 
-// Mock: reemplazar por la petición real (GET /families/geolocated) cuando se reconecte la lógica
-const familiasMock = [
-  { id: 1, nombre: "Familia García Pérez", lat: 7.1193, lng: -73.1227 },
-  { id: 2, nombre: "Familia Rojas Ibáñez", lat: 7.0631, lng: -73.0864 },
-  { id: 3, nombre: "Familia Suárez Moreno", lat: 7.1254, lng: -73.0000 },
-  { id: 4, nombre: "Familia Ortiz Camacho", lat: 7.3873, lng: -73.4014 },
-  { id: 5, nombre: "Familia Pabón Duarte", lat: 6.6919, lng: -73.0714 },
-  { id: 6, nombre: "Familia Villamizar Ríos", lat: 7.8891, lng: -72.4967 },
-  { id: 7, nombre: "Familia Amaya Serrano", lat: 6.4536, lng: -73.2596 },
-];
-
 function FlyToPoint({ point }) {
   const map = useMap();
   if (point) {
@@ -47,6 +37,27 @@ export const MapaView = () => {
   const [lat, setLat] = useState("");
   const [lng, setLng] = useState("");
   const [errores, setErrores] = useState({});
+
+  const [planes, setPlanes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const cargarPlanes = async () => {
+      try {
+        const data = await api.get("familyPlans");
+        setPlanes(data ?? []);
+
+        console.log(data);
+        
+      } catch (error) {
+        console.error("Error cargando planes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarPlanes();
+  }, []);
 
   const [puntoBuscado, setPuntoBuscado] = useState(null);
   const [radio, setRadio] = useState("");
@@ -125,12 +136,17 @@ export const MapaView = () => {
 
           {puntoBuscado && <FlyToPoint point={puntoBuscado} />}
 
-          {familiasMock.map((familia) => (
-            <Marker key={familia.id} position={[familia.lat, familia.lng]} icon={iconFamilia}>
+          {planes.map((familia) => (
+            <Marker key={familia.id} position={[familia.coordinates.latitude, familia.coordinates.longitude]} icon={iconFamilia}>
               <Popup>
-                <Link href="/planes-familiares/1">
-                  <UsersRound className="text-(--color_azul)"/>
-                  <strong className="text-(--color_azul)">{familia.nombre}</strong>
+                <Link href={`/planes-familiares/${familia.id}`}>
+                  <UsersRound className="text-(--color_azul) size-10"/>
+
+                  <div className="flex flex-col gap-1">
+                    <strong className="text-(--color_azul)">{`Familia ${familia.last_names}`}</strong>
+                    <span className=""> Coordenadas: {familia.coordinates.latitude}, {familia.coordinates.longitude} </span>
+                  </div>
+
                 </Link>
               </Popup>
             </Marker>
