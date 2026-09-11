@@ -3,18 +3,6 @@ import { z } from "zod";
 // Regex: solo letras (incluye tildes/ñ) y espacios — replica la validación "textoNombres" del vanilla
 const soloTexto = /^[a-zA-ZÀ-ÿ\s]+$/;
 
-// Verifica que la fecha de nacimiento corresponda a alguien mayor de edad —
-// replica la validación "mayorDeEdad" del vanilla (data-validacion="mayorDeEdad")
-const esMayorDeEdad = (fecha) => {
-    if (!fecha) return false;
-    const nacimiento = new Date(fecha);
-    const hoy = new Date();
-    let edad = hoy.getFullYear() - nacimiento.getFullYear();
-    const mes = hoy.getMonth() - nacimiento.getMonth();
-    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) edad--;
-    return edad >= 18;
-};
-
 export const memberSchema = z.object({
     nombres: z.string()
         .min(1, { message: "Los nombres son obligatorios" })

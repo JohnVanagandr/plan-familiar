@@ -38,6 +38,7 @@ import { DepartamentoDetailView, DepartamentosView } from '@/views/datos_maestro
 import { DatosMaestrosView } from '@/views/datos_maestros/DatosMaestrosView';
 import PeticionesAccesoView from '@/views/usuarios/PeticionesAccesoView';
 import UsuarioDetailView from '@/views/usuarios/UsuarioDetailView';
+import { PlansCreateView } from '@/views/PlansCreateView';
 
 
 export const protectedRoutes = [
@@ -67,9 +68,13 @@ export const protectedRoutes = [
       },
 
       // --- Rutas de Gestión de Planes ---
+      {
+        path: "/registrar-plan",
+        element: <PlansCreateView />
+      },
       { 
         path: "/planes-familiares", 
-        element: <PlansHistoryView /> 
+        element: <PlansHistoryView />
       },
       { 
         path: "/planes-familiares/:planId", 

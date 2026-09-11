@@ -34,6 +34,7 @@ export const PlansHistoryView = () => {
         description="Administra, crea y consulta el estado de validación de tus planes de emergencia familiares."
         buttonSection
         buttonText="Crear Nuevo Plan"
+        buttonUrl = "/registrar-plan"
       />
 
       {loading ? (
