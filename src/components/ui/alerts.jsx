@@ -15,6 +15,8 @@ const DEFAULT_ICONS = {
   consent: FileCheck2,
 };
 
+const DEFAULT_CONSENT_TEXT = `De acuerdo con la Ley 1581 de 2012 y el Decreto 1377 de 2013 de Colombia, autorizo a la Defensa Civil Colombiana para recolectar, almacenar y tratar los datos personales suministrados en este formulario, con la finalidad exclusiva de elaborar y hacer seguimiento al Plan Familiar de Emergencia. La información será tratada de forma confidencial y no será compartida con terceros sin autorización, salvo requerimiento de autoridad competente.`;
+
 export const Alert = ({
   text = "",
   icon: IconProp,
@@ -27,7 +29,6 @@ export const Alert = ({
   confirmText,
   cancelText,
   className = "",
-  consentText = "",
   checkboxLabel = "He leído y acepto el tratamiento de mis datos personales",
 } = {}) => {
   const actionVariants = ["confirm", "yesno", "consent"];
@@ -69,6 +70,8 @@ export const Alert = ({
     confirmText ?? defaultTexts[variant]?.confirm ?? "Confirmar";
   const finalCancelText =
     cancelText ?? defaultTexts[variant]?.cancel ?? "Cancelar";
+
+  const consentText = DEFAULT_CONSENT_TEXT;
 
   const iconColor = variantColors[variant] || variantColors.success;
   const finalClasses = `${clasesBase} ${className}`.trim();

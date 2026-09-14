@@ -11,10 +11,12 @@ import {
   Building,
   Building2,
   IdCard,
-  MessageCircleQuestion,
   Flag,
   ShieldPlus,
-  Landmark
+  Landmark,
+  CirclePlus,
+  MessageCircleQuestionMark,
+  MessageCircleQuestion
 } from 'lucide-react';
 import { Badge, Button } from '@/components/ui';
 
@@ -77,6 +79,7 @@ export const DashboardSidebar = ({
   // Los 10 módulos de administración secundaria del plan
   const planWorkspaceModules = [
     { label: "Prensentación", path: "", icon: Home },
+    { label: "Test de Vunerabilidad", path: "test-vulnerabilidad", icon: MessageCircleQuestionMark },
     { label: "Datos Básicos", path: "datos-basicos", icon: FileText },
     { label: "Integrantes", path: "integrantes", icon: Users },
     { label: "Mascotas y Animales", path: "animales", icon: PawPrint },
@@ -200,24 +203,50 @@ export const DashboardSidebar = ({
                 )}
               </NavLink>
 
-              <NavLink
-                to="/planes-familiares"
-                title="Historial de Planes"
-                className={navLinkClasses}
-              >
-                {({ isActive }) => (
-                  <>
-                    <FileText
-                      className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
-                    />
-                    <span
-                      className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
-                    >
-                      Historial de Planes
-                    </span>
-                  </>
-                )}
-              </NavLink>
+              {rol === "Voluntario" && (
+
+                <NavLink
+                  to="/registrar-plan"
+                  title="Registro-familiar"
+                  className={navLinkClasses}
+                >
+                  {({ isActive }) => (
+                    <>
+                      <CirclePlus
+                        className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                      />
+                      <span
+                        className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                      >
+                        Resgistrar Nuevo Plan
+                      </span>
+                    </>
+                  )}
+                </NavLink>
+              )}
+
+              {(rol === "Supervisor" || rol === "Voluntario") && (
+
+                <NavLink
+                  to="/planes-familiares"
+                  title="Historial de Planes"
+                  className={navLinkClasses}
+                >
+                  {({ isActive }) => (
+                    <>
+                      <FileText
+                        className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                      />
+                      <span
+                        className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                      >
+                        Historial de Planes
+                      </span>
+                    </>
+                  )}
+                </NavLink>
+              )}
+
 
               <NavLink
                 to="/dashboard/contacts"

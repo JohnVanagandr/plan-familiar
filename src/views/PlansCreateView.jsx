@@ -1,9 +1,8 @@
-import { Card, Input, Select } from "@/components/ui";
+import { Alert, Button, Card, Input, Select } from "@/components/ui";
 import HeaderSection from "@/components/ui/headerSection";
-import { usePaginacion } from "@/features/auth/hooks/usePaginacion";
 import { planCreateSchema } from "@/features/plans/schemas/planCreate.schema";
 import { Building2, Compass, HouseHeart, MapPin, PenBox } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as api from "@/helpers/api";
 import { useFormValidation } from "@/features/auth/hooks/useFormValidation";
@@ -19,15 +18,23 @@ export const PlansCreateView = () => {
     const [loading, setLoading] = useState([]);
     const [loadingCiudades, setLoadingCiudades] = useState(false);
 
+    const [showConsentAlert, setShowConsentAlert] = useState(false);
+    const [alertVariant, setAlertVariant] = useState("success");
+    const [alertMessage, setAlertMessage] = useState("");
+    const [showToast, setShowToast] = useState(false);
+
+    // Guarda la función para responder al modal (Aceptar/Cancelar) y continuar con la petición
+    const consentResolverRef = useRef(null);
+
     const initialState = {
       apellidos: "",
       zona: "",
       departamento: "",
       ciudad: ""
     };
-    
+
     const { values, setValues, errors, handleChange, validate } = useFormValidation(initialState, planCreateSchema);
-    
+
     useEffect(()=>{
 
         const cargarDatos = async () => {
@@ -53,13 +60,6 @@ export const PlansCreateView = () => {
                   }))
                 );
 
-                // setValues({
-                //     apellidos: last_names ?? "",
-                //     zona: String(zone_id ?? ""),
-                //     departamento: String(department_id ?? ""),
-                //     ciudad: String(city_id ?? "")
-                // });
-
             } catch (error) {
                 console.error("Error cargando los datos solicitados:", error);
                 setAlertVariant("danger");
@@ -72,7 +72,7 @@ export const PlansCreateView = () => {
 
         cargarDatos();
 
-    },[])
+    },[]);
 
     useEffect(()=>{
 
@@ -112,11 +112,52 @@ export const PlansCreateView = () => {
 
         cargarCiudades();
 
-    },[values.departamento])
+    },[values.departamento]);
 
     const handleDepartamentoChange = (event) => {
         handleChange(event);
         setValues((previous) => ({ ...previous, ciudad: "" }));
+    };
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!validate()) {
+          console.warn("El formulario tiene errores de validación que deben corregirse.");
+          return;
+        }
+
+        // Abre el modal y espera aquí mismo a que el usuario decida
+        const acepto = await new Promise((resolve) => {
+            consentResolverRef.current = resolve;
+            setShowConsentAlert(true);
+        });
+
+        if (!acepto) return;
+
+        try {
+            await api.post("familyPlans", {
+                last_names: values.apellidos,
+                zone_id: values.zona,
+                department_id: values.departamento,
+                city_id: values.ciudad,
+                sectional_id: Number(localStorage.getItem("sectional_id")),
+                user_id: Number(localStorage.getItem("id")),
+                family_type_id: 3,
+            });
+
+            setAlertVariant("success");
+            setAlertMessage("Plan familiar registrado con éxito.");
+            setShowToast(true);
+            navigate("/planes-familiares");
+
+        } catch (error) {
+            console.error("Error creando el plan:", error);
+            setAlertVariant("danger");
+            setAlertMessage("No se pudo registrar el plan familiar.");
+            setShowToast(true);
+        }
     };
 
     return (
@@ -130,16 +171,17 @@ export const PlansCreateView = () => {
                 buttonText="Volver"
             />
 
-            <Card className="flex flex-col gap-4">
-
-                <form action="">
+            <Card className="flex">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-7 items-center">
 
                     <Input
                         icon={HouseHeart}
                         type="text"
                         name="apellidos"
                         label="Nombre de la familia"
-                        error={errors.zona}
+                        value={values.apellidos}
+                        onChange={handleChange}
+                        error={errors.apellidos}
                     />
 
                     <Select
@@ -173,10 +215,39 @@ export const PlansCreateView = () => {
                         error={errors.ciudad}
                     />
 
+                    <Button type="submit">
+                        Registrar Familia
+                    </Button>
+
                 </form>
-
-
             </Card>
+
+            <Alert
+                variant="consent"
+                isVisible={showConsentAlert}
+                text="Tratamiento de datos personales"
+                confirmText="Aceptar y registrar"
+                cancelText="Cancelar"
+                onConfirm={() => {
+                    setShowConsentAlert(false);
+                    consentResolverRef.current?.(true);
+                }}
+                onCancel={() => {
+                    setShowConsentAlert(false);
+                    consentResolverRef.current?.(false);
+                }}
+                onClose={() => {
+                    setShowConsentAlert(false);
+                    consentResolverRef.current?.(false);
+                }}
+            />
+
+            <Alert
+                variant={alertVariant}
+                isVisible={showToast}
+                text={alertMessage}
+                onClose={() => setShowToast(false)}
+            />
 
         </div>
     );

@@ -87,11 +87,11 @@ export const VoluntarioDashboard = () => {
           </div>
 
           <div className="w-full flex gap-3 justify-center relative sm:gap-4 xl:justify-start">
-            <Button onClick={() => navigate("/dashboard/plans")}>
+            <Button onClick={() => navigate("/planes-familiares")}>
               Planes Familiares
             </Button>
 
-            <Button variant="secondary" >Crear nuevo plan</Button>
+            <Button variant="secondary" onClick={() => navigate("/registrar-plan")} >Crear nuevo plan</Button>
 
             {/* Circulos decorativos: menos cantidad y más chicos en mobile, todos visibles desde lg */}
             <div className="hidden size-10 bg-(--color_naranja) rounded-full xl:flex justify-center items-center"> <HomeIcon className="text-white"/> </div>

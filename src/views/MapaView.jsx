@@ -136,7 +136,9 @@ export const MapaView = () => {
 
           {puntoBuscado && <FlyToPoint point={puntoBuscado} />}
 
-          {planes.map((familia) => (
+          {planes
+          .filter((familia) => familia.coordinates?.latitude != null && familia.coordinates?.longitude != null)
+          .map((familia) => (
             <Marker key={familia.id} position={[familia.coordinates.latitude, familia.coordinates.longitude]} icon={iconFamilia}>
               <Popup>
                 <Link href={`/planes-familiares/${familia.id}`}>
