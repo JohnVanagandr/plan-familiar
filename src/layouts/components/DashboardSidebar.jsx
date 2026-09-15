@@ -1,4 +1,4 @@
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, PhoneCall, ArrowLeft, 
   FileText, Home, MapPin, Compass, AlertTriangle, 
@@ -11,12 +11,16 @@ import {
   Building,
   Building2,
   IdCard,
-  MessageCircleQuestion,
   Flag,
   ShieldPlus,
-  Landmark
+  Landmark,
+  CirclePlus,
+  MessageCircleQuestionMark,
+  MessageCircleQuestion
 } from 'lucide-react';
 import { Badge, Button } from '@/components/ui';
+import { useEffect, useState } from 'react';
+import * as api from "@/helpers/api";
 
 export const DashboardSidebar = ({ 
   isMobileOpen, 
@@ -25,7 +29,37 @@ export const DashboardSidebar = ({
   setIsDesktopCollapsed 
 }) => {
   const location = useLocation();
+  const {planId} = useParams();
   const navigate = useNavigate();
+
+  const [testRespondido, setTestRespondido] = useState(false);
+
+  useEffect(() => {
+  
+    const cargarDato = async () => {
+  
+      try {
+  
+        const data = await api.get(`vulnerableTest/${planId}`);
+        console.log(data);
+                  
+        if (Array.isArray(data) && data.length > 0) {
+          setTestRespondido(true);
+        }
+                  
+        } catch (error) {
+  
+          console.error("Error cargando los datos solicitados:", error);
+          setAlertVariant("danger");
+          setAlertMessage("No se pudieron cargar los datos de preguntas ya respondidas por la familia.");
+          setShowToast(true);
+        }
+    }
+  
+    cargarDato();
+  
+  }, [planId]);
+      
 
   const rol = localStorage.getItem("rol");
 
@@ -76,16 +110,17 @@ export const DashboardSidebar = ({
 
   // Los 10 módulos de administración secundaria del plan
   const planWorkspaceModules = [
-    { label: "Prensentación", path: "", icon: Home },
-    { label: "Datos Básicos", path: "datos-basicos", icon: FileText },
-    { label: "Integrantes", path: "integrantes", icon: Users },
-    { label: "Mascotas y Animales", path: "animales", icon: PawPrint },
-    { label: "Gráfico de Vivienda", path: "vivienda", icon: ScanBox },
-    { label: "Georreferenciación", path: "georeferenciacion", icon: MapPin },
-    { label: "Gráfico de Entorno", path: "entorno", icon: Compass },
-    { label: "Factores de Riesgo", path: "riesgos", icon: AlertTriangle },
-    { label: "Recursos Disponibles", path: "recursos", icon: Hospital },
-    { label: "Plan de Acción", path: "plan-accion", icon: ListOrdered },
+    { label: "Prensentación", path: "", icon: Home, disabled: false },
+    { label: "Test de Vunerabilidad", path: "test-vulnerabilidad", icon: MessageCircleQuestionMark, disabled: false },
+    { label: "Datos Básicos", path: "datos-basicos", icon: FileText, disabled: !testRespondido },
+    { label: "Integrantes", path: "integrantes", icon: Users, disabled: !testRespondido },
+    { label: "Mascotas y Animales", path: "animales", icon: PawPrint, disabled: !testRespondido },
+    { label: "Gráfico de Vivienda", path: "vivienda", icon: ScanBox, disabled: !testRespondido },
+    { label: "Georreferenciación", path: "georeferenciacion", icon: MapPin, disabled: !testRespondido },
+    { label: "Gráfico de Entorno", path: "entorno", icon: Compass, disabled: !testRespondido },
+    { label: "Factores de Riesgo", path: "riesgos", icon: AlertTriangle, disabled: !testRespondido },
+    { label: "Recursos Disponibles", path: "recursos", icon: Hospital, disabled: !testRespondido },
+    { label: "Plan de Acción", path: "plan-accion", icon: ListOrdered, disabled: !testRespondido },
   ];
 
   // Los 14 catálogos de Datos Maestros
@@ -200,24 +235,50 @@ export const DashboardSidebar = ({
                 )}
               </NavLink>
 
-              <NavLink
-                to="/planes-familiares"
-                title="Historial de Planes"
-                className={navLinkClasses}
-              >
-                {({ isActive }) => (
-                  <>
-                    <FileText
-                      className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
-                    />
-                    <span
-                      className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
-                    >
-                      Historial de Planes
-                    </span>
-                  </>
-                )}
-              </NavLink>
+              {rol === "Voluntario" && (
+
+                <NavLink
+                  to="/registrar-plan"
+                  title="Registro-familiar"
+                  className={navLinkClasses}
+                >
+                  {({ isActive }) => (
+                    <>
+                      <CirclePlus
+                        className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                      />
+                      <span
+                        className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                      >
+                        Resgistrar Nuevo Plan
+                      </span>
+                    </>
+                  )}
+                </NavLink>
+              )}
+
+              {(rol === "Supervisor" || rol === "Voluntario") && (
+
+                <NavLink
+                  to="/planes-familiares"
+                  title="Historial de Planes"
+                  className={navLinkClasses}
+                >
+                  {({ isActive }) => (
+                    <>
+                      <FileText
+                        className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
+                      />
+                      <span
+                        className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
+                      >
+                        Historial de Planes
+                      </span>
+                    </>
+                  )}
+                </NavLink>
+              )}
+
 
               <NavLink
                 to="/dashboard/contacts"
@@ -320,10 +381,14 @@ export const DashboardSidebar = ({
                 return (
                   <NavLink
                     key={idx}
-                    to={targetPath}
+                    to={module.disabled ? "#" : targetPath}
+                    onClick={(e) => module.disabled && e.preventDefault()}
+                    aria-disabled={module.disabled}
                     end={module.path === ""}
-                    title={module.label}
-                    className={navLinkClasses}
+                    className={({ isActive }) => `
+                      ${navLinkClasses({ isActive: !module.disabled && isActive })}
+                      ${module.disabled ? "pointer-events-none opacity-40 select-none" : ""}
+                    `}
                   >
                     {({ isActive }) => (
                       <>
@@ -352,7 +417,7 @@ export const DashboardSidebar = ({
                   }`}
                 >
                   <Send className="w-4 h-4 shrink-0 translate-x-1/2"/>
-                  <span className={`pl-2 overflow-hidden whitespace-nowrap transition-all duration-300 ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}>
+                  <span disabled={!testRespondido} className={`pl-2 overflow-hidden whitespace-nowrap transition-all duration-300 ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}>
                     Enviar
                   </span>
                 </Button>

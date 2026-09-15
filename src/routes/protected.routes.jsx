@@ -38,7 +38,8 @@ import { DepartamentoDetailView, DepartamentosView } from '@/views/datos_maestro
 import { DatosMaestrosView } from '@/views/datos_maestros/DatosMaestrosView';
 import PeticionesAccesoView from '@/views/usuarios/PeticionesAccesoView';
 import UsuarioDetailView from '@/views/usuarios/UsuarioDetailView';
-
+import { PlansCreateView } from '@/views/PlansCreateView';
+import { TestVulnerabilidad } from '@/views/plans/test/TestVulnerabilidadView';
 
 export const protectedRoutes = [
   {
@@ -67,9 +68,13 @@ export const protectedRoutes = [
       },
 
       // --- Rutas de Gestión de Planes ---
+      {
+        path: "/registrar-plan",
+        element: <PlansCreateView />
+      },
       { 
         path: "/planes-familiares", 
-        element: <PlansHistoryView /> 
+        element: <PlansHistoryView />
       },
       { 
         path: "/planes-familiares/:planId", 
@@ -77,6 +82,9 @@ export const protectedRoutes = [
         children: [
           // Redirección por defecto al primer módulo del plan, la presentación
           { index: true, element: <PresentacionView /> },
+
+          // Test se guarda como apartado hasta que no se resuelva todas los modulos del plan quedan bloquedos
+          { path: "test-vulnerabilidad", element:<TestVulnerabilidad /> },
           
           // Los 9 módulos de administración del plan
           { path: "datos-basicos", element: <DatosBasicosView /> },

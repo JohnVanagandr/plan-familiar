@@ -252,7 +252,7 @@ export const SupervisorDashboard = () => {
           <div className="w-full flex justify-center pt-2">
             <Button
               icon={<UsersRound className="size-5" />}
-              onClick={() => navigate("/dashboard/plans")}
+              onClick={() => navigate("/planes-familiares")}
             >
               Ver todos los planes
             </Button>

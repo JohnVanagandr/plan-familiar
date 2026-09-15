@@ -62,6 +62,7 @@ export const DatosBasicosView = () => {
         ]);
 
         setFamiliaData(data);
+        
         setDepartamentos(
           (departmentsData ?? []).map((department) => ({
             value: String(department.id),
@@ -182,6 +183,9 @@ export const DatosBasicosView = () => {
     return <p className="text-(--color_azul)">No se encontró el plan familiar.</p>;
   }
 
+  console.log(familiaData);
+  
+
   return (
     <div className="flex flex-col gap-4 lg:flex-row">
 
@@ -196,7 +200,7 @@ export const DatosBasicosView = () => {
             Datos Básicos
           </h1>
           <p className="text-(--color_azul)/80 mt-1">
-            Tipo de familia: {familiaData.familyType?.name ?? "Sin definir"}
+            Tipo de familia: {familiaData.family_type}
           </p>
         </div>
 
