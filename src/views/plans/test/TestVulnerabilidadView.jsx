@@ -1,23 +1,21 @@
 import { Alert, Button, Card } from "@/components/ui";
 import HeaderSection from "@/components/ui/headerSection";
 import { usePaginacion } from "@/features/auth/hooks/usePaginacion";
-import { MessageCircleQuestionMark } from "lucide-react";
-import { useState } from "react";
+import { BadgeQuestionMark, MessageCircleQuestionMark, ShieldCheck, Lock } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import * as api from "@/helpers/api";
 
 export const TestVulnerabilidad = () => {
 
     const {planId} = useParams();
-    const navigate = useNavigate
+    const navigate = useNavigate();
 
     const [respuesta, setRespuesta] = useState([]);
+    const [testRespondido, setTestRespondido] = useState(false);
     const [alertVariant, setAlertVariant] = useState([]);
     const [alertMessage, setAlertMessage] = useState([]);
     const [showToast, setShowToast] = useState(false);
-
-
-
-
 
     const {
     items: preguntas,
@@ -90,6 +88,39 @@ export const TestVulnerabilidad = () => {
             setShowToast(true);
         }
     };
+
+    useEffect(() => {
+
+        const cargarDato = async () => {
+
+            try {
+
+                const data = await api.get(`vulnerableTest/${planId}`);
+                console.log(data);
+                
+                if (Array.isArray(data) && data.length > 0) {
+                    const preguntasRespondidas = data.reduce((respondido, item) => {
+                        // Convierte el booleano 'answer' del backend a "1" o "0"
+                        respondido[item.vulnerable_question_id] = item.answer ? "1" : "0";
+                        return respondido;
+                    }, {});
+
+                    setRespuesta(preguntasRespondidas);
+                    setTestRespondido(true);
+                }
+                
+            } catch (error) {
+
+                console.error("Error cargando los datos solicitados:", error);
+                setAlertVariant("danger");
+                setAlertMessage("No se pudieron cargar los datos de preguntas ya respondidas por la familia.");
+                setShowToast(true);
+            }
+        }
+
+        cargarDato();
+
+    }, [planId]);
     
     return (
 
@@ -98,8 +129,21 @@ export const TestVulnerabilidad = () => {
             <HeaderSection
                 icon={<MessageCircleQuestionMark />}
                 title="Test de Vulnerabilidad"
-                description="Responda las siguientes preguntas según su apreciación haciendo click en SI o NO."
+                description="Responda SÍ o NO a cada una de las preguntas. Si se registran más de 5 respuestas afirmativas, la familia será clasificada como Vulnerable. Las preguntas destacadas en amarillo son informativas y evalúan el nivel de preparación ante una emergencia (no suman al puntaje)."
+                image="/svg/ilustracion_voluntario.svg"
             />
+
+            {testRespondido ? (
+                <div className="bg-blue-50 border border-blue-200 p-4 rounded-2xl flex items-center gap-3 text-(--color_azul) text-xs font-medium shadow-xs">
+                    <ShieldCheck className="w-5 h-5 shrink-0 text-(--color_azul)" />
+                    <span>El test de vulnerabilidad ha sido completado. Ya puedes acceder y gestionar todos los módulos del plan familiar.</span>
+                </div>
+            ) : (
+                <div className="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex items-center gap-3 text-amber-800 text-xs font-medium shadow-xs">
+                    <Lock className="w-5 h-5 shrink-0 text-(--color_naranja)" />
+                    <span>Para habilitar el acceso a los módulos del plan familiar se debe realizar primero el test de vulnerabilidad. Tenga en cuenta que una vez evaluado no podrá ser modificado.</span>
+                </div>
+            )}
 
             {loading ? (
                 <Card padding="md" className="w-full text-center text-slate-500">
@@ -115,19 +159,21 @@ export const TestVulnerabilidad = () => {
 
                             {preguntas.map((pregunta) => (
 
-                                <Card key={pregunta.id} padding="md" className="flex gap-4 relative">
+                                <Card key={pregunta.id} padding="md" className={`flex lg:flex-row justify-between gap-4 relative overflow-hidden ${pregunta.question_caution === 1 ? "!bg-amber-100" : ""}`}>
 
-                                    <span>
+                                    <span className="z-10">
                                         {pregunta.description}
                                     </span>
                                     
-                                    <div className="flex gap-6">
+                                    <div className="flex gap-6 px-4 z-10">
                                         
                                         <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-600">
                                             <input
                                                 type="radio"
                                                 name={`pregunta-${pregunta.id}`}
                                                 value="1"
+                                                checked={respuesta[pregunta.id] === "1"}
+                                                disabled={testRespondido}
                                                 className="size-4 accent-(--color_azul)"
                                                 onChange={() => setRespuesta((prev) => ({
                                                     ...prev,
@@ -142,6 +188,8 @@ export const TestVulnerabilidad = () => {
                                                 type="radio"
                                                 name={`pregunta-${pregunta.id}`}
                                                 value="0"
+                                                checked={respuesta[pregunta.id] === "0"}
+                                                disabled={testRespondido}
                                                 className="size-4 accent-(--color_azul)"
                                                 onChange={() => setRespuesta((prev) => ({
                                                     ...prev,
@@ -151,6 +199,8 @@ export const TestVulnerabilidad = () => {
                                             No
                                         </label>
                                     </div>
+
+                                    <BadgeQuestionMark className={`absolute size-30 -top-6 -right-6 ${pregunta.question_caution === 1 ? "text-(--color_naranja)/20":"text-(--color_azul)/20"}`}/>
                                     
                                 </Card>
                             ))}
@@ -176,10 +226,12 @@ export const TestVulnerabilidad = () => {
                                     </button>
                                 ))}
 
-                                <Button onClick={handleEnviarTest}>
+                                {!testRespondido && (
 
-                                    Evaluar
-                                </Button>
+                                    <Button onClick={handleEnviarTest}>
+                                        Evaluar
+                                    </Button>
+                                )}
 
                             </div>
                         )}
