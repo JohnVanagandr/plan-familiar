@@ -1,15 +1,22 @@
-import { Card } from "@/components/ui";
+import { Alert, Button, Card } from "@/components/ui";
 import HeaderSection from "@/components/ui/headerSection";
 import { usePaginacion } from "@/features/auth/hooks/usePaginacion";
 import { MessageCircleQuestionMark } from "lucide-react";
 import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 export const TestVulnerabilidad = () => {
 
-        //     vulnerable_question_id: p.id,
-        // family_plan_id: id,
-        // answer: testRespuestas.respuesta[`opcion-${p.id}`] === "true",
+    const {planId} = useParams();
+    const navigate = useNavigate
+
     const [respuesta, setRespuesta] = useState([]);
+    const [alertVariant, setAlertVariant] = useState([]);
+    const [alertMessage, setAlertMessage] = useState([]);
+    const [showToast, setShowToast] = useState(false);
+
+
+
 
 
     const {
@@ -24,10 +31,64 @@ export const TestVulnerabilidad = () => {
 
     console.log(preguntas);
 
-    const calcularPuntaje = () => {
-        return Object.values(respuesta).reduce((total, valor) => {
-            return valor === "1" ? total + 1 : total - 1;
+    const handleEnviarTest = async () => {
+
+        // Trae TODAS las preguntas activas, no solo las de la página actual
+        const todasLasPreguntas = await api.get("vulnerableQuestions");
+        const preguntasActivas = todasLasPreguntas.filter((p) => p.is_active);
+
+        // Verifica que ninguna quede sin responder
+        const faltantes = preguntasActivas.filter((p) => respuesta[p.id] === undefined);
+
+        if (faltantes.length > 0) {
+            setAlertVariant("danger");
+            setAlertMessage(`Faltan por responder ${faltantes.length} de ${preguntasActivas.length} preguntas.`);
+            setShowToast(true);
+            return;
+        }
+
+        const puntos = preguntasActivas.reduce((total, p) => {
+            if (p.question_caution === 0 && respuesta[p.id] === "1") {
+                return total + 1;
+            }
+            return total;
         }, 0);
+        
+        const esVulnerable = puntos > 5;
+
+        console.log(`Puntaje: ${puntos} — Familia ${esVulnerable ? "VULNERABLE" : "NO VULNERABLE"}`);
+
+        try {
+            // Enviar cada respuesta
+            for (const p of preguntasActivas) {
+                await api.post("vulnerableTest", {
+                    vulnerable_question_id: p.id,
+                    family_plan_id: planId,
+                    answer: respuesta[p.id] === "1",
+                });
+            }
+
+            // Actualizar estado y tipo de familia según el resultado
+            await api.patch(`familyPlans/${planId}/change-status`, {
+                status_plan_id: 3,
+            });
+
+            await api.patch(`familyPlans/${planId}/change-family-type`, {
+                family_type_id: esVulnerable ? 1 : 2,
+            });
+
+            setAlertVariant("success");
+            setAlertMessage(`La familia fue catalogada como ${esVulnerable ? "VULNERABLE" : "NO VULNERABLE"}.`);
+            setShowToast(true);
+
+            navigate(`/planes-familiares/${planId}`);
+
+        } catch (error) {
+            console.error("Error enviando el test:", error);
+            setAlertVariant("danger");
+            setAlertMessage("No se pudo procesar el test de vulnerabilidad.");
+            setShowToast(true);
+        }
     };
     
     return (
@@ -98,7 +159,7 @@ export const TestVulnerabilidad = () => {
             
                         {hayMultiplesPaginas && (
 
-                            <div className="flex justify-center gap-2 mt-4">
+                            <div className="flex justify-center gap-2 w-full">
 
                                 {rangoPaginas.map((n) => (
                                     <button
@@ -115,11 +176,23 @@ export const TestVulnerabilidad = () => {
                                     </button>
                                 ))}
 
+                                <Button onClick={handleEnviarTest}>
+
+                                    Evaluar
+                                </Button>
+
                             </div>
                         )}
             
                     </>
             )}
+
+            <Alert
+                variant={alertVariant}
+                text={alertMessage}
+                isVisible={showToast}
+                onClose={() => setShowToast(false)}
+            />
       </div>
     );
 }
