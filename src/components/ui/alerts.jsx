@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   CheckCircle2,
   AlertCircle,
@@ -50,7 +51,7 @@ export const Alert = ({
   if (!isVisible) return null;
 
   const clasesBase =
-    "size-full fixed inset-0 z-100 flex items-center justify-center bg-white/60 backdrop-blur-md animate-[fadeIn_0.2s_ease-out]";
+    "fixed inset-0 z-[9999] flex items-center justify-center bg-white/60 backdrop-blur-md animate-[fadeIn_0.2s_ease-out]";
 
   const variantColors = {
     success: "text-emerald-600",
@@ -80,7 +81,7 @@ export const Alert = ({
   // Determinar el ícono a renderizar (Componente o String)
   const IconComponent = IconProp || DEFAULT_ICONS[variant] || DEFAULT_ICONS.success;
 
-  return (
+  return createPortal(
     <div
       className={finalClasses}
       onClick={!isActionVariant ? onClose : undefined}
@@ -169,6 +170,7 @@ export const Alert = ({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

@@ -13,23 +13,8 @@ import {
 import { useFormValidation } from "@/features/auth/hooks/useFormValidation.js";
 import { resourceSchema } from "@/features/plans/schemas/resource.schema";
 
-const recursos = [
-  { value: "1", label: "Puesto de Salud - Clinica u Hospital" },
-  { value: "2", label: "Estación de Bomberos" },
-  { value: "3", label: "Estacion de Policia - CAI" },
-  { value: "4", label: "Defensa Civil" },
-  { value: "5", label: "Cruz Roja" },
-  { value: "6", label: "Ejercito Nacional" },
-  { value: "7", label: "Enfermeria" },
-  { value: "8", label: "Extintores" },
-];
+import * as api from "@/helpers/api";
 
-// Mock simulando la respuesta de búsqueda por ID
-const recursosMock = [
-  { id: 1, resource_id: "1", location: "Hospital San Rafael, Girón", distance: "1.2 km", phone: "6076461234", description: "Atiende urgencias 24 horas" },
-  { id: 2, resource_id: "2", location: "Estación de Bomberos Girón", distance: "800 metros", phone: "6076469876", description: "" },
-  { id: 3, resource_id: "4", location: "Sede Defensa Civil Bucaramanga", distance: "3 km", phone: "6076123456", description: "Punto de encuentro y atención en emergencias" },
-];
 
 export const ResourceFormView = () => {
   const { planId, recursoId } = useParams();
@@ -51,49 +36,86 @@ export const ResourceFormView = () => {
     resourceSchema
   );
 
-  const [alertConfig, setAlertConfig] = useState({
-    isVisible: false,
-    variant: "info",
-    text: "",
-    onConfirm: () => {},
-  });
+  const [tiposRecurso, setTiposRecurso] = useState([]);
+  const [loading, setLoading] = useState(isEditing);
+  const [guardando, setGuardando] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertVariant, setAlertVariant] = useState("success");
+  
+  const mostrarAlerta = (variant, message) => {
+    setAlertVariant(variant);
+    setAlertMessage(message);
+    setShowToast(true);
+  };
 
-  // Cargar datos existentes si está en modo edición
   useEffect(() => {
-    if (isEditing) {
-      const recursoFound = recursosMock.find((item) => item.id === Number(recursoId));
-      if (recursoFound) {
-        setValues({
-          resource_id: String(recursoFound.resource_id),
-          location: recursoFound.location,
-          distance: recursoFound.distance,
-          phone: recursoFound.phone,
-          description: recursoFound.description,
-          family_plan_id: planId,
-        });
+    const cargarDatos = async () => {
+      try {
+        const [tiposData, recurso] = await Promise.all([
+          api.get("resources"),
+          isEditing ? api.get(`availableResources/${recursoId}`) : Promise.resolve(null),
+        ]);
+    
+        setTiposRecurso(
+          (tiposData || []).map((item) => ({ value: String(item.id), label: item.name }))
+        );
+    
+        if (recurso) {
+          setValues({
+            resource_id: String(recurso.resource_id),
+            location: recurso.location,
+            distance: String(recurso.distance ?? ""),
+            phone: recurso.phone,
+            description: recurso.description,
+            family_plan_id: planId,
+          });
+        }
+      } catch (error) {
+        console.error("Error al cargar los recursos disponibles:", error.details ?? error);
+        mostrarAlerta("error", "No se pudieron cargar los recursos disponibles.");
+      } finally {
+        setLoading(false);
       }
-    }
+    };
+  
+    cargarDatos();
   }, [isEditing, recursoId, planId, setValues]);
+  
+  
+  if (loading) {
+    return <p className="text-(--color_azul)">Cargando factor de riesgo...</p>;
+  }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (validate()) {
-      const message = isEditing
-        ? "El recurso disponible ha sido actualizado correctamente."
-        : "El recurso disponible ha sido creado correctamente.";
-
-      setAlertConfig({
-        isVisible: true,
-        variant: "info",
-        text: message,
-        onConfirm: () => {
-          setAlertConfig((prev) => ({ ...prev, isVisible: false }));
-          navigate(`/planes-familiares/${planId}/recursos`);
-        },
-      });
-    } else {
+    if (!validate()) {
       console.warn("El formulario contiene errores de validación.");
+      return;
+    }
+
+    setGuardando(true);
+
+    try {
+      if (isEditing) {
+        await api.patch(`availableResources/${recursoId}`, values);
+      } else {
+        await api.post("availableResources", values);
+      }
+
+      mostrarAlerta(
+        "success",
+        isEditing
+          ? "El recurso disponible ha sido actualizado correctamente."
+          : "El recurso disponible ha sido creado correctamente."
+      );
+
+      setTimeout(() => navigate(`/planes-familiares/${planId}/recursos`), 1500);
+    } catch (error) {
+      console.error("Error al guardar el recurso disponible:", error.details ?? error);
+      mostrarAlerta("error", "No se pudo guardar el recurso disponible.");
+      setGuardando(false);
     }
   };
 
@@ -127,7 +149,7 @@ export const ResourceFormView = () => {
               name="resource_id"
               value={values.resource_id}
               onChange={handleChange}
-              arrayOptions={recursos}
+              arrayOptions={tiposRecurso}
               error={errors.resource_id}
             />
 
@@ -154,7 +176,7 @@ export const ResourceFormView = () => {
             <Input
               icon={Phone}
               type="text"
-              placeholder="Teléfono de contacto (opcional)"
+              placeholder="Teléfono de contacto"
               name="phone"
               value={values.phone}
               onChange={handleChange}
@@ -164,7 +186,7 @@ export const ResourceFormView = () => {
             <div className="sm:col-span-2">
               <Textarea
                 icon={AlignLeft}
-                placeholder="Descripción (opcional)"
+                placeholder="Descripción"
                 name="description"
                 value={values.description}
                 onChange={handleChange}
@@ -173,18 +195,17 @@ export const ResourceFormView = () => {
             </div>
           </div>
 
-          <Button type="submit" variant="accent" size="lg" className="mt-4">
+          <Button type="submit" variant="accent" size="lg" className="mt-4" isLoading={guardando}>
             {isEditing ? "Guardar cambios" : "Guardar"}
           </Button>
         </form>
       </Card>
 
       <Alert
-        isVisible={alertConfig.isVisible}
-        variant={alertConfig.variant}
-        text={alertConfig.text}
-        onConfirm={alertConfig.onConfirm}
-        onClose={() => setAlertConfig((prev) => ({ ...prev, isVisible: false }))}
+        variant={alertVariant}
+        text={alertMessage}
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
       />
     </div>
   );

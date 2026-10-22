@@ -86,7 +86,11 @@ export const EditarView = () => {
         setNacionalidades((nacionalidadesData || []).map((item) => ({ value: String(item.id), label: item.name })));
         setEps((epsData || []).map((item) => ({ value: String(item.id), label: item.name })));
         setTiposCondicion((conditionData || []).map((item) => ({ value: String(item.id), label: item.name })));
-        setCondiciones((conditionsData || []).map((item) => ({ id: item.id, typeLabel: item.condition_type?.name ?? item.condition_type_name ?? "Afección", name: item.name})));
+        setCondiciones((conditionsData || []).map((item) => ({
+          id: item.id,
+          typeLabel: item.condition_type?.name ?? item.condition_type_name ?? "Afección",
+          name: item.name
+        })));
 
         setValues({
           nombres: miembro.names ?? "",
@@ -103,7 +107,7 @@ export const EditarView = () => {
         });
       } catch (error) {
         console.error("Error al cargar el integrante:", error.details ?? error);
-        setAlertVariant("danger");
+        setAlertVariant("error");
         setAlertMessage("No se pudieron cargar los datos del integrante.");
         setShowToast(true);
       } finally {
@@ -111,9 +115,13 @@ export const EditarView = () => {
       }
     };
 
-    if (integranteId) cargarDatos();
+    if (integranteId) {
+      cargarDatos();
+    } else {
+      setLoading(false);
+    }
   }, [integranteId, setValues]);
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -142,7 +150,7 @@ export const EditarView = () => {
       setShowToast(true);
     } catch (error) {
       console.error("Error al actualizar el integrante:", error.details ?? error);
-      setAlertVariant("danger");
+      setAlertVariant("error");
       setAlertMessage("No se pudieron actualizar los datos del integrante.");
       setShowToast(true);
     }
@@ -153,28 +161,33 @@ export const EditarView = () => {
       setErrorCondicion("Selecciona un tipo y escribe el nombre de la condición.");
       return;
     }
-  
+
     try {
-      const afeccionCreada = await api.post("conditionMembers", {
+      const respuesta = await api.post("conditionMembers", {
         member_id: integranteId,
         condition_type_id: nuevaCondicion.condition_type_id,
         name: nuevaCondicion.name.trim(),
       });
-  
+
+      console.log("Respuesta POST conditionMembers:", respuesta);
+
+      // El registro puede venir en la raíz o envuelto en "data"
+      const afeccionCreada = respuesta?.data ?? respuesta;
+
       const tipoSeleccionado = tiposCondicion.find(
         (t) => String(t.value) === String(nuevaCondicion.condition_type_id)
       );
-  
+
       setErrorCondicion("");
       setCondiciones((prev) => [
         ...prev,
         {
-          id: afeccionCreada.id,
+          id: afeccionCreada?.id ?? `tmp-${Date.now()}`,
           typeLabel: tipoSeleccionado?.label || "Afección",
-          name: afeccionCreada.name,
+          name: afeccionCreada?.name ?? nuevaCondicion.name.trim(),
         },
       ]);
-  
+
       setNuevaCondicion({ condition_type_id: "", name: "" });
       setFormCondicion(false);
     } catch (error) {
@@ -199,7 +212,6 @@ export const EditarView = () => {
         onButtonClick={() => navigate(`/planes-familiares/${planId}/integrantes`)}
       />
 
-      {/* ... el resto del JSX del formulario queda igual ... */}
       <div className="flex flex-col gap-6">
         {/* Formulario Principal */}
         <Card padding="none" className="w-full p-5 sm:p-7">
@@ -402,7 +414,7 @@ export const EditarView = () => {
       </div>
 
       <Alert
-        variant="success"
+        variant={alertVariant}
         text={alertMessage}
         isVisible={showToast}
         onClose={() => setShowToast(false)}

@@ -17,13 +17,12 @@ export const resourceSchema = z.object({
 
   phone: z
     .string()
-    .max(20, { message: "El teléfono no puede tener más de 20 caracteres" })
-    .optional()
-    .or(z.literal("")),
+    .min(1, { message: "El télefono es obligatoria" })
+    .max(20, { message: "El teléfono no puede tener más de 20 caracteres" }),
 
   description: z
     .string()
-    .max(500, { message: "La descripción no puede tener más de 500 caracteres" })
-    .optional()
-    .or(z.literal("")),
+    .min(1, { message: "La descripción es obligatoria" })
+    .max(500, { message: "La descripción no puede tener más de 500 caracteres" }),
+    // .or(z.literal("")),
 });

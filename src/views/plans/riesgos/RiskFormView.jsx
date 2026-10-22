@@ -11,25 +11,26 @@ import {
 } from "lucide-react";
 import { useFormValidation } from "@/features/auth/hooks/useFormValidation.js";
 import { riskSchema } from "@/features/plans/schemas/risk.schema";
+import * as api from "@/helpers/api";
 
-const tiposAmenaza = [
-  { value: "1", label: "Inundación" },
-  { value: "2", label: "Deslizamiento" },
-  { value: "3", label: "Creciente Súbita" },
-  { value: "4", label: "Caída Colapso Estructural" },
-  { value: "5", label: "Contaminación Plagas" },
-  { value: "6", label: "Caída de árboles rocas" },
-  { value: "7", label: "Colapso Estructural Traumas Quemaduras" },
-  { value: "8", label: "Riesgo de Accidentes" },
-  { value: "9", label: "Otro" },
-];
+// const tiposAmenaza = [
+//   { value: "1", label: "Inundación" },
+//   { value: "2", label: "Deslizamiento" },
+//   { value: "3", label: "Creciente Súbita" },
+//   { value: "4", label: "Caída Colapso Estructural" },
+//   { value: "5", label: "Contaminación Plagas" },
+//   { value: "6", label: "Caída de árboles rocas" },
+//   { value: "7", label: "Colapso Estructural Traumas Quemaduras" },
+//   { value: "8", label: "Riesgo de Accidentes" },
+//   { value: "9", label: "Otro" },
+// ];
 
 // Mock simulando la respuesta de búsqueda por ID
-const factoresMock = [
-  { id: 1, threat_type_id: "1", description: "La vivienda se encuentra a orillas de la quebrada, con antecedentes de desbordamiento en temporada de lluvias.", distance: "15 metros", ubication: "Parte trasera de la vivienda" },
-  { id: 2, threat_type_id: "6", description: "Árbol de gran tamaño con raíces expuestas junto al patio, riesgo de caída sobre el techo.", distance: "3 metros", ubication: "Patio trasero" },
-  { id: 3, threat_type_id: "4", description: "Muro perimetral con fisuras visibles y desplome parcial, riesgo de colapso.", distance: "1 metro", ubication: "Muro lateral izquierdo" },
-];
+// const factoresMock = [
+//   { id: 1, threat_type_id: "1", description: "La vivienda se encuentra a orillas de la quebrada, con antecedentes de desbordamiento en temporada de lluvias.", distance: "15 metros", ubication: "Parte trasera de la vivienda" },
+//   { id: 2, threat_type_id: "6", description: "Árbol de gran tamaño con raíces expuestas junto al patio, riesgo de caída sobre el techo.", distance: "3 metros", ubication: "Patio trasero" },
+//   { id: 3, threat_type_id: "4", description: "Muro perimetral con fisuras visibles y desplome parcial, riesgo de colapso.", distance: "1 metro", ubication: "Muro lateral izquierdo" },
+// ];
 
 export const RiskFormView = () => {
   const { planId, riesgoId } = useParams();
@@ -50,48 +51,128 @@ export const RiskFormView = () => {
     riskSchema
   );
 
-  const [alertConfig, setAlertConfig] = useState({
-    isVisible: false,
-    variant: "info",
-    text: "",
-    onConfirm: () => {},
-  });
+
+  const [tiposAmenaza, setTiposAmenaza] = useState([]);
+  const [loading, setLoading] = useState(isEditing);
+  const [guardando, setGuardando] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertVariant, setAlertVariant] = useState("success");
+  
+  const mostrarAlerta = (variant, message) => {
+    setAlertVariant(variant);
+    setAlertMessage(message);
+    setShowToast(true);
+  };
+
 
   // Cargar datos existentes si está en modo edición
+  // useEffect(() => {
+  //   if (isEditing) {
+  //     const factorFound = factoresMock.find((item) => item.id === Number(riesgoId));
+  //     if (factorFound) {
+  //       setValues({
+  //         threat_type_id: String(factorFound.threat_type_id),
+  //         description: factorFound.description,
+  //         ubication: factorFound.ubication,
+  //         distance: factorFound.distance,
+  //         family_plan_id: planId,
+  //       });
+  //     }
+  //   }
+  // }, [isEditing, riesgoId, planId, setValues]);
+
   useEffect(() => {
-    if (isEditing) {
-      const factorFound = factoresMock.find((item) => item.id === Number(riesgoId));
-      if (factorFound) {
-        setValues({
-          threat_type_id: String(factorFound.threat_type_id),
-          description: factorFound.description,
-          ubication: factorFound.ubication,
-          distance: factorFound.distance,
-          family_plan_id: planId,
-        });
+    const cargarDatos = async () => {
+      try {
+        const [tiposData, factor] = await Promise.all([
+          api.get("threatTypes"),
+          isEditing ? api.get(`riskFactors/${riesgoId}`) : Promise.resolve(null),
+        ]);
+  
+        setTiposAmenaza(
+          (tiposData || []).map((item) => ({ value: String(item.id), label: item.name }))
+        );
+  
+        if (factor) {
+          setValues({
+            threat_type_id: String(factor.threat_type_id ?? ""),
+            description: factor.description ?? "",
+            ubication: factor.ubication ?? "",
+            distance: String(factor.distance ?? ""),
+            family_plan_id: planId,
+          });
+        }
+      } catch (error) {
+        console.error("Error al cargar el factor de riesgo:", error.details ?? error);
+        mostrarAlerta("error", "No se pudieron cargar los datos del factor de riesgo.");
+      } finally {
+        setLoading(false);
       }
-    }
+    };
+
+    cargarDatos();
   }, [isEditing, riesgoId, planId, setValues]);
 
-  const handleSubmit = (e) => {
+
+  if (loading) {
+    return <p className="text-(--color_azul)">Cargando factor de riesgo...</p>;
+  }
+
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+
+  //   if (validate()) {
+  //     const message = isEditing
+  //       ? "El factor de riesgo ha sido actualizado correctamente."
+  //       : "El factor de riesgo ha sido creado correctamente.";
+
+  //     setAlertConfig({
+  //       isVisible: true,
+  //       variant: "info",
+  //       text: message,
+  //       onConfirm: () => {
+  //         setAlertConfig((prev) => ({ ...prev, isVisible: false }));
+  //         navigate(`/planes-familiares/${planId}/riesgos`);
+  //       },
+  //     });
+  //   } else {
+  //     console.warn("El formulario contiene errores de validación.");
+  //   }
+  // };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (validate()) {
-      const message = isEditing
-        ? "El factor de riesgo ha sido actualizado correctamente."
-        : "El factor de riesgo ha sido creado correctamente.";
-
-      setAlertConfig({
-        isVisible: true,
-        variant: "info",
-        text: message,
-        onConfirm: () => {
-          setAlertConfig((prev) => ({ ...prev, isVisible: false }));
-          navigate(`/planes-familiares/${planId}/riesgos`);
-        },
-      });
-    } else {
+  
+    if (!validate()) {
       console.warn("El formulario contiene errores de validación.");
+      return;
+    }
+  
+    setGuardando(true);
+  
+    try {
+      if (isEditing) {
+        await api.patch(`riskFactors/${riesgoId}`, values);
+      } else {
+        await api.post("riskFactors", values);
+      }
+  
+      mostrarAlerta(
+        "success",
+        isEditing
+          ? "El factor de riesgo ha sido actualizado correctamente."
+          : "El factor de riesgo ha sido creado correctamente."
+      );
+  
+
+      setTimeout(() => navigate(`/planes-familiares/${planId}/riesgos`), 1500);
+      
+    } catch (error) {
+
+      console.error("Error al guardar el factor de riesgo:", error.details ?? error);
+      mostrarAlerta("error", "No se pudo guardar el factor de riesgo.");
+      setGuardando(false); // solo si falla, para poder reintentar
     }
   };
 
@@ -161,19 +242,28 @@ export const RiskFormView = () => {
             </div>
           </div>
 
-          <Button type="submit" variant="accent" size="lg" className="mt-4">
+          <Button type="submit" variant="accent" size="lg" className="mt-4" isLoading={guardando}>
             {isEditing ? "Guardar cambios" : "Guardar"}
           </Button>
+          
         </form>
       </Card>
 
-      <Alert
+      {/* <Alert
         isVisible={alertConfig.isVisible}
         variant={alertConfig.variant}
         text={alertConfig.text}
         onConfirm={alertConfig.onConfirm}
         onClose={() => setAlertConfig((prev) => ({ ...prev, isVisible: false }))}
+      /> */}
+
+      <Alert
+        variant={alertVariant}
+        text={alertMessage}
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
       />
+
     </div>
   );
 };

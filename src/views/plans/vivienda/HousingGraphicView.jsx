@@ -1,18 +1,46 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Card, Button } from "@/components/ui";
 import { ScanBox, PlusCircle, Home, Building, Pencil } from "lucide-react";
 import HeaderSection from "@/components/ui/headerSection";
+import * as api from "@/helpers/api";
 
 // Mock: reemplazar por la petición real (GET /housingGraphics/familyPlan/:id) cuando se reconecte la lógica
-const graficosMock = [
-  { id: 1, description: "Planta primer piso", path: "https://picsum.photos/seed/plano12a/500/500" },
-  { id: 2, description: "Distribución de habitaciones y rutas de salida", path: "https://picsum.photos/seed/plano12b/500/500" },
-  { id: 3, description: "Punto de encuentro y salida de emergencia", path: "https://picsum.photos/seed/plano12c/500/500" },
-];
+// const graficosMock = [
+//   { id: 1, description: "Planta primer piso", path: "https://picsum.photos/seed/plano12a/500/500" },
+//   { id: 2, description: "Distribución de habitaciones y rutas de salida", path: "https://picsum.photos/seed/plano12b/500/500" },
+//   { id: 3, description: "Punto de encuentro y salida de emergencia", path: "https://picsum.photos/seed/plano12c/500/500" },
+// ];
 
 export const HousingGraphicView = () => {
   const { planId } = useParams();
   const navigate = useNavigate();
+  
+  const [graficos, setGraficos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+
+  useEffect(() => {
+    const cargarGraficos = async () => {
+      try {
+        const data = await api.get(`housingGraphics/familyPlan/${planId}`);
+        setGraficos(data || []);
+      } catch (error) {
+        // Un 404 solo significa que el plan todavía no tiene gráficos
+        if (error?.code !== 404) {
+          console.error("Error al cargar los gráficos de vivienda:", error.details ?? error);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarGraficos();
+  }, [planId]);
+  
+  if (loading) {
+    return <p className="text-(--color_azul)">Cargando gráficos de vivienda...</p>;
+  }
 
   return (
     <div className="w-full flex flex-col gap-6">
@@ -39,13 +67,13 @@ export const HousingGraphicView = () => {
         </Button>
       </div>
 
-      {graficosMock.length === 0 ? (
+      {graficos.length === 0 ? (
         <Card padding="md" className="w-full text-center text-slate-500">
           Este plan familiar no tiene gráficos de vivienda registrados.
         </Card>
       ) : (
-        <div className="w-full grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
-          {graficosMock.map((grafico) => (
+        <div className="w-full grid grid-cols-2 gap-4 sm:grid-cols-3">
+          {graficos.map((grafico) => (
             <Card
               key={grafico.id}
               padding="none"

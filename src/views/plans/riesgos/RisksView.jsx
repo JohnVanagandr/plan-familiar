@@ -11,33 +11,43 @@ import {
 } from "lucide-react";
 import HeaderSection from "@/components/ui/headerSection";
 import { RiskIcon } from "@/helpers/RiskIcon";
+import { useEffect, useState } from "react";
+import * as api from "@/helpers/api";
 
-const tiposAmenaza = [
-  { value: "1", label: "Inundación" },
-  { value: "2", label: "Deslizamiento" },
-  { value: "3", label: "Creciente Súbita" },
-  { value: "4", label: "Caída Colapso Estructural" },
-  { value: "5", label: "Contaminación Plagas" },
-  { value: "6", label: "Caída de árboles rocas" },
-  { value: "7", label: "Colapso Estructural Traumas Quemaduras" },
-  { value: "8", label: "Riesgo de Accidentes" },
-  { value: "9", label: "Otro" },
-];
-const factoresMock = [
-  { id: 1, threat_type_id: 1, description: "La vivienda se encuentra a orillas de la quebrada, con antecedentes de desbordamiento en temporada de lluvias.", distance: "15 metros", ubication: "Parte trasera de la vivienda" },
-  { id: 2, threat_type_id: 6, description: "Árbol de gran tamaño con raíces expuestas junto al patio, riesgo de caída sobre el techo.", distance: "3 metros", ubication: "Patio trasero" },
-  { id: 3, threat_type_id: 4, description: "Muro perimetral con fisuras visibles y desplome parcial, riesgo de colapso.", distance: "1 metro", ubication: "Muro lateral izquierdo" },
-];
+// const factoresMock = [
+//   { id: 1, threat_type_id: 1, description: "La vivienda se encuentra a orillas de la quebrada, con antecedentes de desbordamiento en temporada de lluvias.", distance: "15 metros", ubication: "Parte trasera de la vivienda" },
+//   { id: 2, threat_type_id: 6, description: "Árbol de gran tamaño con raíces expuestas junto al patio, riesgo de caída sobre el techo.", distance: "3 metros", ubication: "Patio trasero" },
+//   { id: 3, threat_type_id: 4, description: "Muro perimetral con fisuras visibles y desplome parcial, riesgo de colapso.", distance: "1 metro", ubication: "Muro lateral izquierdo" },
+// ];
 
 export const RisksView = () => {
   const { planId } = useParams();
   const navigate = useNavigate();
 
-  // Mapeo del mock resolviendo la etiqueta de la amenaza
-  const factores = factoresMock.map((f) => ({
-    ...f,
-    threatType: tiposAmenaza.find((t) => Number(t.value) === f.threat_type_id)?.label ?? "Otro riesgo",
-  }));
+  const [factores, setFactores] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const cargarFactores = async () => {
+      try {
+        const data = await api.get(`riskFactors/familyPlan/${planId}`);
+        setFactores(data || []);
+      } catch (error) {
+
+        if (error?.code !== 404) {
+          console.error("Error al cargar los factores de riesgo:", error.details ?? error);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    cargarFactores();
+  }, [planId]);
+  
+  if (loading) {
+    return <p className="text-(--color_azul)">Cargando factores de riesgo...</p>;
+  }
   
 
   return (
@@ -96,7 +106,7 @@ export const RisksView = () => {
                 </div>
                 <div className="flex flex-col gap-1 pr-6">
                   <span className="font-bold text-(--color_azul) text-lg leading-tight">
-                    {factor.threatType}
+                    {factor.threat_type_name}
                   </span>
                   <p className="text-slate-600 text-sm line-clamp-2">
                     {factor.description}

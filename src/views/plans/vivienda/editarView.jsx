@@ -1,23 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, Button, Textarea, Alert } from "@/components/ui";
 import HeaderSection from "@/components/ui/headerSection";
 import { ScanBox, Trash2, Save } from "lucide-react";
-
-// Mock: reemplazar por la petición real (GET /housingGraphics/:id) cuando se reconecte la lógica
-const graficosMock = [
-  { id: 1, description: "Fachada principal de la vivienda", path: "https://picsum.photos/seed/vivienda12a/600/500" },
-  { id: 2, description: "Interior - sala comedor", path: "https://picsum.photos/seed/vivienda12b/600/500" },
-  { id: 3, description: "Techo en mal estado, zona vulnerable", path: "https://picsum.photos/seed/vivienda12c/600/500" },
-];
+import * as api from "@/helpers/api";
 
 export const EditarView = () => {
   const { planId, graficoId } = useParams();
   const navigate = useNavigate();
 
-  const grafico = graficosMock.find((g) => g.id === Number(graficoId));
+  const [grafico, setGrafico] = useState(null);
+  const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const [description, setDescription] = useState(grafico?.description ?? "");
+  // const [description, setDescription] = useState(grafico?.description ?? "");
   const [alertConfig, setAlertConfig] = useState({
     isVisible: false,
     variant: "yesno",
@@ -25,6 +21,45 @@ export const EditarView = () => {
     onConfirm: () => {},
     onCancel: () => {},
   });
+
+  useEffect(() => {
+    const cargarGrafico = async () => {
+      try {
+        const data = await api.get(`housingGraphics/${graficoId}`);
+        setGrafico(data);
+        setDescription(data?.description ?? "");
+      } catch (error) {
+        // Un 404 significa que el gráfico no existe: se muestra "Gráfico no encontrado."
+        if (error?.code !== 404) {
+          console.error("Error al cargar el gráfico de vivienda:", error.details ?? error);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (graficoId) {
+      cargarGrafico();
+    } else {
+      setLoading(false);
+    }
+  }, [graficoId]);
+
+
+  const mostrarAlerta = (variant, text, extra = {}) =>
+    setAlertConfig({
+      isVisible: true,
+      variant,
+      text,
+      onConfirm: () => {},
+      onCancel: () => {},
+      ...extra,
+    });
+  
+  // AGREGAR 7: mientras carga, antes del "if (!grafico)" (si no, parpadearía "no encontrado"):
+  if (loading) {
+    return <p className="text-(--color_azul)">Cargando gráfico de vivienda...</p>;
+  }
 
   if (!grafico) {
     return (
@@ -34,28 +69,63 @@ export const EditarView = () => {
     );
   }
 
-  const handleGuardar = () => {
-    // Mock: acá iría el PATCH real /housingGraphics/:id/description
-    setAlertConfig({
-      isVisible: true,
-      variant: "info",
-      text: "Descripción actualizada con éxito.",
-      onConfirm: () => setAlertConfig((prev) => ({ ...prev, isVisible: false })),
-      onConfirm: () => {
-        setAlertConfig((prev) => ({ ...prev, isVisible: false }));
-        navigate(`/planes-familiares/${id}/vivienda`);
-      },
-    });
+  // const handleGuardar = () => {
+  //   // Mock: acá iría el PATCH real /housingGraphics/:id/description
+  //   setAlertConfig({
+  //     isVisible: true,
+  //     variant: "info",
+  //     text: "Descripción actualizada con éxito.",
+  //     onConfirm: () => setAlertConfig((prev) => ({ ...prev, isVisible: false })),
+  //     onConfirm: () => {
+  //       setAlertConfig((prev) => ({ ...prev, isVisible: false }));
+  //       navigate(`/planes-familiares/${id}/vivienda`);
+  //     },
+  //   });
+  // };
+
+  const handleGuardar = async () => {
+    if (!description.trim()) {
+      mostrarAlerta("error", "Debes escribir una descripción.");
+      return;
+    }
+  
+    try {
+      await api.patch(`housingGraphics/${graficoId}/description`, {
+        description: description.trim(),
+      });
+  
+      mostrarAlerta("success", "Descripción actualizada con éxito.");
+      
+      setTimeout(() => navigate(`/planes-familiares/${planId}/vivienda`), 1500);
+    } catch (error) {
+      console.error("Error al actualizar la descripción:", error.details ?? error);
+      mostrarAlerta("error", "No se pudo actualizar la descripción.");
+    }
   };
 
+  // const handleEliminar = () => {
+  //   setAlertConfig({
+  //     isVisible: true,
+  //     variant: "yesno",
+  //     text: "¿Eliminar este gráfico de vivienda? Esta acción no se puede deshacer.",
+  //     onConfirm: () => {
+  //       // Mock: acá iría el DELETE real /housingGraphics/:id
+  //       navigate(`/planes-familiares/${planId}/vivienda`);
+  //     },
+  //   });
+  // };
+
   const handleEliminar = () => {
-    setAlertConfig({
-      isVisible: true,
-      variant: "yesno",
-      text: "¿Eliminar este gráfico de vivienda? Esta acción no se puede deshacer.",
-      onConfirm: () => {
-        // Mock: acá iría el DELETE real /housingGraphics/:id
-        navigate(`/planes-familiares/${planId}/vivienda`);
+    mostrarAlerta("yesno", "¿Eliminar este gráfico de vivienda? Esta acción no se puede deshacer.", {
+      onConfirm: async () => {
+        try {
+          await api.del(`housingGraphics/${graficoId}`);
+          mostrarAlerta("success", "Gráfico eliminado con éxito.");
+          setTimeout(() => navigate(`/planes-familiares/${planId}/vivienda`), 1500);
+        } catch (error) {
+          console.error("Error al eliminar el gráfico de vivienda:", error.details ?? error);
+          mostrarAlerta("error", "No se pudo eliminar el gráfico de vivienda.");
+        }
       },
     });
   };
