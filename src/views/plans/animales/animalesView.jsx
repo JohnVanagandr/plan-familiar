@@ -4,43 +4,64 @@ import { Smile, PawPrint, Dog, Fish, Bird, PlusCircle } from "lucide-react";
 import HeaderSection from "@/components/ui/headerSection";
 import { GenderIcon } from "@/helpers/GenderIcon";
 import { SpecieIcon } from "@/helpers/SpecieIcon";
+import { useEffect, useState } from "react";
+import * as api from "@/helpers/api";
 
 // Mock: reemplazar por la petición real (GET /members/plan/:id) cuando se reconecte la lógica
-const especies = [
-  { value: "1", label: "Perro" },
-  { value: "2", label: "Gato" },
-  { value: "3", label: "Conejo" },
-  { value: "4", label: "Roedor" },
-  { value: "5", label: "Ave" },
-  { value: "6", label: "Insecto" },
-  { value: "7", label: "Pez" },
-  { value: "8", label: "Rana" },
-  { value: "9", label: "Serpiente" },
-  { value: "10", label: "Tortuga" },
-];
+// const especies = [
+//   { value: "1", label: "Perro" },
+//   { value: "2", label: "Gato" },
+//   { value: "3", label: "Conejo" },
+//   { value: "4", label: "Roedor" },
+//   { value: "5", label: "Ave" },
+//   { value: "6", label: "Insecto" },
+//   { value: "7", label: "Pez" },
+//   { value: "8", label: "Rana" },
+//   { value: "9", label: "Serpiente" },
+//   { value: "10", label: "Tortuga" },
+// ];
 
-const generos = [
-  { value: "1", label: "Macho" },
-  { value: "2", label: "Hembra" },
-];
+// const generos = [
+//   { value: "1", label: "Macho" },
+//   { value: "2", label: "Hembra" },
+// ];
 
-const mascotasMock = [
-  { id: 1, name: "Lucas", breed: "Criollo", birth_date: "2020-04-10", animal_gender_id: 1, species_id: 1, family_plan_id: 12 },
-  { id: 2, name: "Michi", breed: "Siamés", birth_date: "2021-08-15", animal_gender_id: 2, species_id: 2, family_plan_id: 12 },
-  { id: 3, name: "Bruno", breed: "Golden Retriever", birth_date: "2019-01-20", animal_gender_id: 1, species_id: 1, family_plan_id: 13 },
-  { id: 4, name: "Copito", breed: "Cabeza de León", birth_date: "2022-11-05", animal_gender_id: 1, species_id: 3, family_plan_id: 14 },
-];
+// const mascotasMock = [
+//   { id: 1, name: "Lucas", breed: "Criollo", birth_date: "2020-04-10", animal_gender_id: 1, species_id: 1, family_plan_id: 12 },
+//   { id: 2, name: "Michi", breed: "Siamés", birth_date: "2021-08-15", animal_gender_id: 2, species_id: 2, family_plan_id: 12 },
+//   { id: 3, name: "Bruno", breed: "Golden Retriever", birth_date: "2019-01-20", animal_gender_id: 1, species_id: 1, family_plan_id: 13 },
+//   { id: 4, name: "Copito", breed: "Cabeza de León", birth_date: "2022-11-05", animal_gender_id: 1, species_id: 3, family_plan_id: 14 },
+// ];
 
 export const AnimalesView = () => {
-  const { id } = useParams();
+
+  const { planId } = useParams();
   const navigate = useNavigate();
 
   // Mock: en un futuro esto vendría de filtrar por `id` (useParams) contra la API real
-  const mascotas = mascotasMock.map((m) => ({
-    ...m,
-    gender: generos.find((g) => Number(g.value) === m.animal_gender_id)?.label ?? "Sin definir",
-    specie: especies.find((e) => Number(e.value) === m.species_id)?.label ?? "N/D",
-  }));
+  // const mascotas = mascotasMock.map((m) => ({
+  //   ...m,
+  //   gender: generos.find((g) => Number(g.value) === m.animal_gender_id)?.label ?? "Sin definir",
+  //   specie: especies.find((e) => Number(e.value) === m.species_id)?.label ?? "N/D",
+  // }));
+ 
+  const [mascotas, setMascotas] = useState([]);
+  const [loading, setLoading] = useState(true);
+ 
+  useEffect(() => {
+    const cargarMascotas = async () => {
+      try {
+        const data = await api.get(`pets/familyPlan/${planId}`);
+        setMascotas(data || []);
+      } catch (error) {
+        console.error("Error al cargar las mascotas:", error.details ?? error);
+      } finally {
+        setLoading(false);
+      }
+    };
+ 
+    cargarMascotas();
+  }, [planId]);
 
   return (
     <div className="w-full flex flex-col gap-6">
@@ -62,15 +83,17 @@ export const AnimalesView = () => {
         <div className="size-8 bg-(--color_azul) rounded-full flex justify-center items-center"><Bird className="text-white size-5"/></div>
         <Button
           variant="accent"
-          onClick={() => navigate(`/planes-familiares/${id}/animales/crear`)}
+          onClick={() => navigate(`/planes-familiares/${planId}/animales/crear`)}
         >
           <PlusCircle className="size-5" /> Agregar animal
         </Button>
       </div>
 
-      {mascotas.length === 0 ? (
+      {loading ? (
+        <p className="text-(--color_azul)">Cargando mascotas...</p>
+      ) : mascotas.length === 0 ? (
         <Card padding="md" className="w-full text-center text-slate-500">
-          No hay integrantes registrados para este plan.
+          No hay mascotas registradas para este plan.
         </Card>
       ) : (
         <div className="w-full grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -79,34 +102,31 @@ export const AnimalesView = () => {
               key={mascota.id}
               padding="md"
               className="relative w-full flex flex-col items-start justify-between gap-4 cursor-pointer overflow-hidden"
-              onClick={() => navigate(`/planes-familiares/${id}/animales/${mascota.id}/editar`)}
+              onClick={() => navigate(`/planes-familiares/${planId}/animales/${mascota.id}/editar`)}
             >
+
               <div className="flex items-start gap-4">
                 <div className="flex items-center gap-1 text-white font-semibold text-sm bg-(--color_naranja) size-15 min-h-15 min-w-15 rounded-full z-10">
                   <span className="w-full text-center text-xl p-4">
-
-                    {GenderIcon(mascota.gender, "size-full")}
-
+                    {GenderIcon(mascota.animal_gender_name, "size-full")}
                   </span>
                 </div>
                 <div className="flex flex-col">
                   <span className="font-bold text-(--color_azul) text-lg">
                     {mascota.name}
                   </span>
-                  <span className="text-slate-500 text-sm">{`${mascota.specie} • ${mascota.breed}`}</span>
-                  <span className="text-slate-400 text-xs">{mascota.birth_date}</span>
+                  <span className="text-slate-500 text-sm">{`${mascota.species_name} • ${mascota.breed}`}</span>
+                  <span className="text-slate-400 text-xs">{`Edad: ${mascota.age}`}</span>
                 </div>
-
               </div>
-
-              {/* <Smile className="absolute size-40 z-5 text-(--color_azul)/20 top-2 right-5"/> */}
-
-              {SpecieIcon(mascota.specie, "absolute size-40 z-5 text-(--color_azul)/20 top-2 right-5")}
+ 
+              {SpecieIcon(mascota.species_name, "absolute size-40 z-5 text-(--color_azul)/20 top-2 right-5")}
+              
             </Card>
           ))}
+          
         </div>
       )}
-
     </div>
   );
 };

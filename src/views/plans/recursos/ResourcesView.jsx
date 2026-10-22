@@ -11,33 +11,39 @@ import {
   Ruler,
 } from "lucide-react";
 import HeaderSection from "@/components/ui/headerSection";
+import { useEffect, useState } from "react";
+import * as api from "@/helpers/api";
 
-const recursos = [
-  { value: "1", label: "Puesto de Salud - Clinica u Hospital" },
-  { value: "2", label: "Estación de Bomberos" },
-  { value: "3", label: "Estacion de Policia - CAI" },
-  { value: "4", label: "Defensa Civil" },
-  { value: "5", label: "Cruz Roja" },
-  { value: "6", label: "Ejercito Nacional" },
-  { value: "7", label: "Enfermeria" },
-  { value: "8", label: "Extintores" },
-];
-
-const recursosMock = [
-  { id: 1, resource_id: 1, location: "Hospital San Rafael, Girón", distance: "1.2 km", phone: "6076461234" },
-  { id: 2, resource_id: 2, location: "Estación de Bomberos Girón", distance: "800 metros", phone: "6076469876" },
-  { id: 3, resource_id: 4, location: "Sede Defensa Civil Bucaramanga", distance: "3 km", phone: "6076123456" },
-];
 
 export const ResourcesView = () => {
   const { planId } = useParams();
   const navigate = useNavigate();
 
-  // Mapeo del mock resolviendo la etiqueta del recurso
-  const disponibles = recursosMock.map((r) => ({
-    ...r,
-    resourceName: recursos.find((c) => Number(c.value) === r.resource_id)?.label ?? "Recurso",
-  }));
+  const [recursos, setRecursos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  
+  useEffect(() => {
+    const cargarRecursos = async () => {
+      try {
+        const data = await api.get(`availableResources/familyPlan/${planId}`);
+        setRecursos(data || []);
+      } catch (error) {
+        // Un 404 solo significa que el plan todavía no tiene recursos
+        if (error?.code !== 404) {
+          console.error("Error al cargar los recursos disponibles:", error.details ?? error);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarRecursos();
+  }, [planId]);
+    
+  if (loading) {
+    return <p className="text-(--color_azul)">Cargando recursos disponibles...</p>;
+  }
 
   return (
 
@@ -75,13 +81,13 @@ export const ResourcesView = () => {
 
       </div>
 
-      {disponibles.length === 0 ? (
+      {recursos.length === 0 ? (
         <Card padding="md" className="w-full text-center text-slate-500">
           Este plan familiar no tiene recursos disponibles registrados.
         </Card>
       ) : (
         <div className="w-full grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {disponibles.map((recurso) => (
+          {recursos.map((recurso) => (
             <Card
               key={recurso.id}
               padding="md"
@@ -93,9 +99,14 @@ export const ResourcesView = () => {
                   <Hospital className="size-8 text-white" />
                 </div>
                 <div className="flex flex-col gap-1 pr-6">
+                  {/* CAMBIO: antes recurso.resourceName (ya no existe); ahora resource_name de la API */}
                   <span className="font-bold text-(--color_azul) text-lg leading-tight">
-                    {recurso.resourceName}
+                    {recurso.resource_name}
                   </span>
+                  {/* CAMBIO (opcional): la API también manda "service", se muestra como subtítulo */}
+                  {recurso.service && (
+                    <span className="text-slate-600 text-sm">{recurso.service}</span>
+                  )}
                   <div className="flex flex-col gap-3 mt-1 text-slate-500 text-xs">
                     <span className="flex items-center gap-1">
                       <MapPin className="size-3.5 text-(--color_naranja)" />

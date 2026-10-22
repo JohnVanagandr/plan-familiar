@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, Button, Input, Select, Alert } from "@/components/ui";
 import HeaderSection from "@/components/ui/headerSection";
-import { 
-  Calendar, 
-  Pill, 
-  Plus, 
+import {
+  Calendar,
+  Plus,
   Eye,
   VenusAndMars,
   Calendar1,
@@ -17,34 +16,30 @@ import {
 import { useFormValidation } from "@/features/auth/hooks/useFormValidation.js";
 import { petSchema } from "@/features/plans/schemas/pet.schema";
 import { SpecieIcon } from "@/helpers/SpecieIcon";
-
+import * as api from "@/helpers/api";
 
 export const EditarView = () => {
-  const { id } = useParams();
+  const { planId, animalId } = useParams();
   const navigate = useNavigate();
 
-  const especies = [ { value: 1, label: "Perro" } ];
-  const generosAnimal = [ { value: 1, label: "Macho" } ];
+  const [especies, setEspecies] = useState([]);
+  const [generosAnimal, setGenerosAnimal] = useState([]);
+  const [vacunas, setVacunas] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Datos mock visuales iniciales del integrante
   const initialValues = {
-    name: "Lucas",
-    breed: "Criollo",
-    birth_date: "2020-04-10",
-    animal_gender_id: 1,
-    species_id: 1,
-    family_plan_id: 12
+    name: "",
+    breed: "",
+    birth_date: "",
+    animal_gender_id: "",
+    species_id: "",
+    family_plan_id: planId,
   };
 
-  const { values, errors, handleChange, validate } = useFormValidation(
+  const { values, errors, handleChange, validate, setValues } = useFormValidation(
     initialValues,
     petSchema
   );
-
-  const [vacunas, setVacunas] = useState([
-    { id: 1, pet_id: 1, name: "Rabia", date: "2021-04-12" },
-    { id: 2, pet_id: 1, name: "Pentavalente", date: "2021-05-10" }
-  ]);
 
   const [formVacuna, setFormVacuna] = useState(false);
   const [nuevaVacuna, setNuevaVacuna] = useState({ name: "", date: "" });
@@ -52,67 +47,154 @@ export const EditarView = () => {
 
   const [showToast, setShowToast] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [alertVariant, setAlertVariant] = useState("success");
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    const cargarDatos = async () => {
+      try {
+        const [mascota, vacunasData, especiesData, generosData] = await Promise.all([
+          api.get(`pets/${animalId}`),
+          api.get(`petVaccines/pet/${animalId}`),
+          api.get("species"),
+          api.get("animalGenders"),
+        ]);
+
+        setEspecies(
+          (especiesData || []).map((item) => ({ value: String(item.id), label: item.name }))
+        );
+        setGenerosAnimal(
+          (generosData || []).map((item) => ({ value: String(item.id), label: item.name }))
+        );
+
+        setVacunas(
+          (vacunasData || []).map((v) => ({
+            id: v.id,
+            pet_id: v.pet_id,
+            name: v.name,
+            date: v.date?.slice(0, 10) ?? "",
+          }))
+        );
+
+        setValues({
+          name: mascota.name ?? "",
+          breed: mascota.breed ?? "",
+          birth_date: mascota.birth_date?.slice(0, 10) ?? "",
+          animal_gender_id: String(mascota.animal_gender_id ?? ""),
+          species_id: String(mascota.species_id ?? ""),
+          family_plan_id: String(mascota.family_plan_id ?? planId),
+        });
+      } catch (error) {
+        console.error("Error al cargar la mascota:", error.details ?? error);
+        setAlertVariant("error");
+        setAlertMessage("No se pudieron cargar los datos de la mascota.");
+        setShowToast(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (animalId) {
+      cargarDatos();
+    } else {
+      setLoading(false);
+    }
+  }, [animalId, planId, setValues]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (validate()) {
+    if (!validate()) {
+      console.warn("El formulario contiene errores de validación.");
+      return;
+    }
+
+    try {
+      await api.patch(`pets/${animalId}`, {
+        name: values.name,
+        breed: values.breed,
+        birth_date: values.birth_date,
+        animal_gender_id: values.animal_gender_id,
+        species_id: values.species_id,
+      });
+
+      setAlertVariant("success");
       setAlertMessage("Datos de la mascota actualizados con éxito.");
       setShowToast(true);
-    } else {
-      console.warn("El formulario contiene errores de validación.");
+    } catch (error) {
+      console.error("Error al actualizar la mascota:", error.details ?? error);
+      setAlertVariant("error");
+      setAlertMessage("No se pudieron actualizar los datos de la mascota.");
+      setShowToast(true);
     }
   };
 
-  const handleGuardarVacuna = () => {
+  const handleGuardarVacuna = async () => {
     if (!nuevaVacuna.name.trim() || !nuevaVacuna.date.trim()) {
       setErrorVacuna("Completa el nombre y la fecha de la vacuna.");
       return;
     }
 
-    setErrorVacuna("");
-    setVacunas((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        pet_id: Number(id),
+    try {
+      const respuesta = await api.post("petVaccines", {
+        pet_id: animalId,
         name: nuevaVacuna.name.trim(),
-        date: nuevaVacuna.date.trim()
-      }
-    ]);
+        date: nuevaVacuna.date.trim(),
+      });
 
-    setNuevaVacuna({ name: "", date: "" });
-    setFormVacuna(false);
+      const creada = respuesta?.data ?? respuesta;
+
+      setErrorVacuna("");
+      setVacunas((prev) => [
+        ...prev,
+        {
+          id: creada.id,
+          pet_id: Number(animalId),
+          name: creada.name ?? nuevaVacuna.name.trim(),
+          date: creada.date?.slice(0, 10) ?? nuevaVacuna.date.trim(),
+        },
+      ]);
+
+      setNuevaVacuna({ name: "", date: "" });
+      setFormVacuna(false);
+    } catch (error) {
+      console.error("Error al guardar la vacuna:", error.details ?? error);
+      setErrorVacuna(error.message || "No se pudo guardar la vacuna.");
+    }
   };
 
-  // console.log(values.especie)
-  
+  if (loading) {
+    return <p className="text-(--color_azul)">Cargando datos de la mascota...</p>;
+  }
+
+  const especieActual =
+    especies.find((e) => e.value === String(values.species_id))?.label ?? "";
+
   return (
     <div className="w-full flex flex-col gap-6">
       <HeaderSection
-        icon={SpecieIcon("perro")}
-        title={`${values.name}`}
+        icon={SpecieIcon(especieActual)}
+        title={values.name}
         description="Edita y gestiona la mascota o animal de compañia seleccionado."
         image="/svg/ilustracion_mascotas.svg"
         buttonSection
         buttonText="Volver"
-        onButtonClick={() => navigate(`/planes-familiares/${id}/animales`)}
+        onButtonClick={() => navigate(`/planes-familiares/${planId}/animales`)}
       />
 
       <div className="flex flex-col gap-6">
-        {/* Formulario Principal */}
+        {/* Formulario principal */}
         <Card padding="none" className="w-full p-5 sm:p-7">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <h2 className="text-lg font-bold text-(--color_azul) flex items-center gap-2 mb-2">
               <PawPrint className="size-5 text-(--color_naranja)" />
-              Datos del integrante
+              Datos de la mascota
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 icon={PawPrint}
                 type="text"
-                placeholder="Nombres"
+                placeholder="Nombre"
                 name="name"
                 value={values.name}
                 onChange={handleChange}
@@ -158,7 +240,6 @@ export const EditarView = () => {
                 onChange={handleChange}
                 error={errors.birth_date}
               />
-
             </div>
 
             <Button type="submit" variant="accent" size="lg" className="mt-4">
@@ -167,7 +248,7 @@ export const EditarView = () => {
           </form>
         </Card>
 
-        {/* Panel de Vacunas */}
+        {/* Panel de vacunas */}
         <Card padding="none" className="w-full p-5 sm:p-7 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-(--color_azul) flex items-center gap-2">
@@ -197,7 +278,6 @@ export const EditarView = () => {
                 onChange={(e) =>
                   setNuevaVacuna((prev) => ({ ...prev, name: e.target.value }))
                 }
-                // error={errorVacuna}
               />
 
               <Input
@@ -241,7 +321,7 @@ export const EditarView = () => {
       </div>
 
       <Alert
-        variant="success"
+        variant={alertVariant}
         text={alertMessage}
         isVisible={showToast}
         onClose={() => setShowToast(false)}

@@ -18,13 +18,10 @@ import {
 import { useFormValidation } from "@/features/auth/hooks/useFormValidation.js";
 import { memberSchema } from "@/features/plans/schemas/member.schema"; // Ajusta según tu esquema
 import * as api from "@/helpers/api";
-import { set } from "zod";
-import { tr } from "zod/v4/locales";
 
 export const CrearView = () => {
   const { planId } = useParams();
   const navigate = useNavigate();
-
 
   const [tiposDocumento, setTiposDocumento] = useState([]);
   const [generos, setGeneros] = useState([]);
@@ -63,9 +60,7 @@ export const CrearView = () => {
         setEps(
           (epsData || []).map((item) => ({ value: item.id, label: item.name }))
         );
-
-      }
-      catch (error) {
+      } catch (error) {
         console.error("Error al cargar los catálogos:", error);
       }
     };
@@ -109,7 +104,8 @@ export const CrearView = () => {
     }
 
     try {
-      const responce = await api.post(`members/${planId}`, {
+      const respuesta = await api.post(`members/${planId}`, {
+        
         names: values.nombres,
         last_names: values.apellidos,
         document_type_id: values.tipoDocumento,
@@ -123,22 +119,30 @@ export const CrearView = () => {
         phone: values.celularPersonal,
       });
 
+      // console.log("Respuesta members:", respuesta);
+
+      const nuevoId = respuesta?.id ?? respuesta?.data?.id;
+
       setAlertConfig({
         isVisible: true,
         variant: "yesno",
         text: "¿Deseas agregar enfermedades o afecciones que padezca el integrante?",
         onConfirm: () => {
           setAlertConfig((prev) => ({ ...prev, isVisible: false }));
-          navigate(`/planes-familiares/${planId}/integrantes/${responce.id}/editar`);
+          if (nuevoId) {
+            navigate(`/planes-familiares/${planId}/integrantes/${nuevoId}/editar`);
+          } else {
+            navigate(`/planes-familiares/${planId}/integrantes`);
+          }
         },
         onCancel: () => {
           navigate(`/planes-familiares/${planId}/integrantes`);
         },
       });
-
     } catch (error) {
       console.error("Error al guardar el integrante:", error);
     }
+
   };
 
   return (
@@ -150,7 +154,7 @@ export const CrearView = () => {
         image="/svg/ilustracion_familia_c.svg"
         buttonSection
         buttonText="Volver"
-        onButtonClick={() => navigate(`/planes-familiares/${id}/integrantes`)}
+        onButtonClick={() => navigate(`/planes-familiares/${planId}/integrantes`)}
       />
 
       <Card padding="none" className="w-full p-5 sm:p-7">

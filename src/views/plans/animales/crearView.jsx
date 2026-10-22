@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, Button, Input, Select, Alert } from "@/components/ui";
 import HeaderSection from "@/components/ui/headerSection";
-import { 
-  Calendar, 
+import {
+  Calendar,
   VenusAndMars,
   PawPrint,
   Dna,
@@ -11,23 +11,36 @@ import {
 } from "lucide-react";
 import { useFormValidation } from "@/features/auth/hooks/useFormValidation.js";
 import { petSchema } from "@/features/plans/schemas/pet.schema";
-import { SpecieIcon } from "@/helpers/SpecieIcon";
+import * as api from "@/helpers/api";
 
 export const CrearView = () => {
-  const { id } = useParams();
+  const { planId } = useParams();
   const navigate = useNavigate();
 
-  const especies = [
-    { value: "1", label: "Perro" },
-    { value: "2", label: "Gato" },
-    { value: "3", label: "Ave" },
-    { value: "4", label: "Roedor" },
-  ];
+  const [especies, setEspecies] = useState([]);
+  const [generosAnimal, setGenerosAnimal] = useState([]);
 
-  const generosAnimal = [
-    { value: "1", label: "Macho" },
-    { value: "2", label: "Hembra" },
-  ];
+  useEffect(() => {
+    const cargarCatalogos = async () => {
+      try {
+        const [especiesData, generosData] = await Promise.all([
+          api.get("species"),
+          api.get("animalGenders"),
+        ]);
+
+        setEspecies(
+          (especiesData || []).map((item) => ({ value: String(item.id), label: item.name }))
+        );
+        setGenerosAnimal(
+          (generosData || []).map((item) => ({ value: String(item.id), label: item.name }))
+        );
+      } catch (error) {
+        console.error("Error al cargar los catálogos:", error.details ?? error);
+      }
+    };
+
+    cargarCatalogos();
+  }, []);
 
   const initialValues = {
     name: "",
@@ -35,13 +48,15 @@ export const CrearView = () => {
     birth_date: "",
     animal_gender_id: "",
     species_id: "",
-    family_plan_id: id,
+    family_plan_id: planId,
   };
 
   const { values, errors, handleChange, validate } = useFormValidation(
     initialValues,
     petSchema
   );
+
+  const [guardando, setGuardando] = useState(false);
 
   const [alertConfig, setAlertConfig] = useState({
     isVisible: false,
@@ -51,24 +66,51 @@ export const CrearView = () => {
     onCancel: () => {},
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (validate()) {
+    if (!validate()) {
+      console.warn("El formulario contiene errores de validación.");
+      return;
+    }
+
+    setGuardando(true);
+
+    try {
+      const respuesta = await api.post("pets", {
+        name: values.name,
+        breed: values.breed,
+        birth_date: values.birth_date,
+        animal_gender_id: values.animal_gender_id,
+        species_id: values.species_id,
+        family_plan_id: planId,
+      });
+
+      console.log("Respuesta POST pets:", respuesta);
+
+      // El id puede venir en la raíz o envuelto en "data"
+      const nuevoId = respuesta?.id ?? respuesta?.data?.id;
+
       setAlertConfig({
         isVisible: true,
         variant: "yesno",
         text: "¿Deseas agregar las vacunas que tiene la mascota?",
         onConfirm: () => {
           setAlertConfig((prev) => ({ ...prev, isVisible: false }));
-          navigate(`/planes-familiares/${id}/animales/1/editar`);
+          if (nuevoId) {
+            navigate(`/planes-familiares/${planId}/animales/${nuevoId}/editar`);
+          } else {
+            navigate(`/planes-familiares/${planId}/animales`);
+          }
         },
         onCancel: () => {
-          navigate(`/planes-familiares/${id}/animales`);
+          navigate(`/planes-familiares/${planId}/animales`);
         },
       });
-    } else {
-      console.warn("El formulario contiene errores de validación.");
+    } catch (error) {
+      console.error("Error al guardar la mascota:", error.details ?? error);
+    } finally {
+      setGuardando(false);
     }
   };
 
@@ -81,7 +123,7 @@ export const CrearView = () => {
         image="/svg/ilustracion_mascotas.svg"
         buttonSection
         buttonText="Volver"
-        onButtonClick={() => navigate(`/planes-familiares/${id}/animales`)}
+        onButtonClick={() => navigate(`/planes-familiares/${planId}/animales`)}
       />
 
       <Card padding="none" className="w-full p-5 sm:p-7">
@@ -143,8 +185,8 @@ export const CrearView = () => {
             />
           </div>
 
-          <Button type="submit" variant="accent" size="lg" className="mt-4">
-            Guardar
+          <Button type="submit" variant="accent" size="lg" className="mt-4" disabled={guardando}>
+            {guardando ? "Guardando..." : "Guardar"}
           </Button>
         </form>
       </Card>

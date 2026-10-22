@@ -18,7 +18,7 @@ import {
   MessageCircleQuestionMark,
   MessageCircleQuestion
 } from 'lucide-react';
-import { Badge, Button } from '@/components/ui';
+import { Alert, Badge, Button } from '@/components/ui';
 import { useEffect, useState } from 'react';
 import * as api from "@/helpers/api";
 
@@ -33,11 +33,24 @@ export const DashboardSidebar = ({
   const navigate = useNavigate();
 
   const [testRespondido, setTestRespondido] = useState(false);
+  const [alertVariant, setAlertVariant] = useState("info");
+  const [alertMessage, setAlertMessage] = useState("");
+  const [showToast, setShowToast] = useState(false);
+
+  const [alertConfig, setAlertConfig] = useState({
+    isVisible: false,
+    variant: "yesno",
+    text: "",
+    onConfirm: () => {},
+    onCancel: () => {},
+  });
 
   useEffect(() => {
-  
+    
     const cargarDato = async () => {
-  
+
+      if (!planId) return;
+      
       try {
   
         const data = await api.get(`vulnerableTest/${planId}`);
@@ -45,6 +58,8 @@ export const DashboardSidebar = ({
                   
         if (Array.isArray(data) && data.length > 0) {
           setTestRespondido(true);
+        } else {
+          setTestRespondido(false);
         }
                   
         } catch (error) {
@@ -53,6 +68,7 @@ export const DashboardSidebar = ({
           setAlertVariant("danger");
           setAlertMessage("No se pudieron cargar los datos de preguntas ya respondidas por la familia.");
           setShowToast(true);
+          setTestRespondido(false);
         }
     }
   
@@ -107,6 +123,85 @@ export const DashboardSidebar = ({
       : "px-4 w-full"
     }
   `;
+
+  const handleEnviarPlan = async () => {
+    if (!planId) return;
+
+    // Función auxiliar para extraer los faltantes exactamente de la estructura de tu backend
+    const procesarFaltantes = (responseData) => {
+      // Si la respuesta viene envuelta en un objeto de axios/api, tomamos su data o details
+      const datos = responseData?.data ?? responseData;
+      const faltantes = [];
+
+      // Validaciones basadas en tu servicio de backend
+      if (datos?.has_min_members === false)    faltantes.push('Mínimo 2 integrantes');
+      if (datos?.has_risk_factors === false)   faltantes.push('Al menos 1 factor de riesgo');
+      if (datos?.has_resources === false)      faltantes.push('Al menos 1 recurso disponible');
+      if (datos?.has_photos === false)         faltantes.push('Al menos 1 foto del entorno');
+      if (datos?.has_action_before === false)  faltantes.push('Plan de acción: falta Antes');
+      if (datos?.has_action_during === false)  faltantes.push('Plan de acción: falta Durante');
+      if (datos?.has_action_after === false)   faltantes.push('Plan de acción: falta Después');
+
+      const detalles = faltantes.length > 0 ? faltantes.join(', ') : 'El plan no cumple con los requisitos mínimos.';
+      
+      setAlertVariant("error");
+      setAlertMessage(`Plan incompleto: ${detalles}`);
+      setShowToast(true);
+    };
+
+    setAlertConfig({
+      isVisible: true,
+      variant: "yesno",
+      text: "¿Seguro que ya deseas enviar tu plan familiar?",
+      onConfirm: async () => {
+        setAlertConfig((prev) => ({ ...prev, isVisible: false }));
+
+        try {
+          // 1. Validar requisitos en el backend
+          const response = await api.get(`familyPlans/validate-requirements/${planId}`);
+          
+          // Tu backend retorna { error: false, code: 422, message: '...', data: { is_valid: false, ... } }
+          const validateData = response?.data ?? response;
+
+          if (validateData && validateData.is_valid === false) {
+            procesarFaltantes(response);
+            return;
+          }
+
+          // 2. Si es válido, cambiar el estado a 4 (Enviado a Revisión)
+          const dataStatus = await api.patch(`familyPlans/${planId}/change-status`, {
+            status_plan_id: 4, 
+          });
+
+          if (dataStatus) {
+            setAlertVariant("success");
+            setAlertMessage(dataStatus.message || "Plan familiar enviado con éxito.");
+            setShowToast(true);
+
+            setTimeout(() => {
+              navigate("/planes-familiares");
+            }, 1500);
+          }
+        } catch (error) {
+          console.error("Error al enviar el plan:", error);
+
+          // Capturar errores HTTP (como el 422 que lanza Laravel cuando falla la validación)
+          const errorPayload = error.response?.data ?? error.details ?? error;
+
+          if (errorPayload && (errorPayload.is_valid === false || errorPayload.data?.is_valid === false)) {
+            procesarFaltantes(errorPayload);
+          } else {
+            setAlertVariant("error");
+            setAlertMessage(error.message || "Ocurrió un error al procesar el envío del plan.");
+            setShowToast(true);
+          }
+        }
+      },
+      onCancel: () => {
+        setAlertConfig((prev) => ({ ...prev, isVisible: false }));
+      },
+    });
+  };
 
   // Los 10 módulos de administración secundaria del plan
   const planWorkspaceModules = [
@@ -204,12 +299,8 @@ export const DashboardSidebar = ({
 
         {/* Navegación Condicional */}
         <nav className={`flex-1 space-y-1.5 relative z-10 overflow-y-auto overflow-x-hidden
-          [&::-webkit-scrollbar]:h-2
-          [&::-webkit-scrollbar]:w-1
-          [&::-webkit-scrollbar-track]:rounded-full
-          [&::-webkit-scrollbar-track]:bg-scrollbar-track
-          [&::-webkit-scrollbar-thumb]:rounded-full
-          [&::-webkit-scrollbar-thumb]:bg-(--color_azul)
+          [scrollbar-width:none]
+          [&::-webkit-scrollbar]:hidden
           ${(isInPlanWorkspace || isInDatosMaestros) ? "rounded-4xl" : "rounded-0"}
         `}>
           {!isInPlanWorkspace && !isInDatosMaestros ? (
@@ -278,26 +369,6 @@ export const DashboardSidebar = ({
                   )}
                 </NavLink>
               )}
-
-
-              <NavLink
-                to="/dashboard/contacts"
-                title="Contactos Operativos"
-                className={navLinkClasses}
-              >
-                {({ isActive }) => (
-                  <>
-                    <PhoneCall
-                      className={`translate-x-2 w-5 h-5 min-h-5 shrink-0 transition-colors duration-300 ${isActive ? "text-white" : "text-blue-400 group-hover:text-(--color_azul)"}`}
-                    />
-                    <span
-                      className={`overflow-hidden pl-2 whitespace-nowrap transition-all duration-300 ${isActive ? "text-white" : "text-(--color_azul)"} ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}
-                    >
-                      Contactos Operativos
-                    </span>
-                  </>
-                )}
-              </NavLink>
 
               {rol === "Supervisor" && (
 
@@ -407,21 +478,23 @@ export const DashboardSidebar = ({
               })}
 
               <div className='w-full'>
+                
                 <Button 
                   variant='sidebar'
                   size='sm'
-                  className={`h-12 w-full justify-start transition-all duration-300 ${
-                    isDesktopCollapsed
-                      ? "lg:justify-center lg:w-12 lg:h-12 lg:p-0"
-                      : "px-4 py-2.5"
-                  }`}
+                  disabled={!testRespondido}
+                  onClick={handleEnviarPlan}
+                  className={`h-12 w-full justify-start transition-all duration-300 ${isDesktopCollapsed ? "lg:justify-center lg:w-12 lg:h-12 lg:p-0" : "px-4 py-2.5"}`}
                 >
                   <Send className="w-4 h-4 shrink-0 translate-x-1/2"/>
-                  <span disabled={!testRespondido} className={`pl-2 overflow-hidden whitespace-nowrap transition-all duration-300 ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}>
+                  
+                  <span className={`pl-2 overflow-hidden whitespace-nowrap transition-all duration-300 ${isDesktopCollapsed ? "lg:w-0" : "w-fit"}`}>
                     Enviar
                   </span>
                 </Button>
+
               </div>
+
             </div>
           ) : (
             // --- NAVEGACIÓN SECUNDARIA (LOS 14 CATÁLOGOS DE DATOS MAESTROS) ---
@@ -485,6 +558,22 @@ export const DashboardSidebar = ({
         </nav>
 
       </div>
+
+      <Alert
+        isVisible={alertConfig.isVisible}
+        variant={alertConfig.variant}
+        text={alertConfig.text}
+        onConfirm={alertConfig.onConfirm}
+        onCancel={alertConfig.onCancel}
+        onClose={() => setAlertConfig((prev) => ({ ...prev, isVisible: false }))}
+      />
+
+      <Alert
+        variant={alertVariant}
+        text={alertMessage}
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+      />
 
     </aside>
   );

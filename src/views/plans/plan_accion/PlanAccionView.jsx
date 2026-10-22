@@ -1,26 +1,27 @@
 // PlanAccionView.jsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, Button, Select, Textarea } from "@/components/ui";
+import { Card, Button, Select, Textarea, Alert } from "@/components/ui";
 import HeaderSection from "@/components/ui/headerSection";
 import { ClipboardList, UserRound, ShieldAlert, Plus, TriangleAlert } from "lucide-react";
+import * as api from "@/helpers/api";
 
 // Mock: reemplazar por la petición real (GET /members/plan/:id, GET /riskFactors/plan/:id) cuando se reconecte la lógica
-const miembrosMock = [
-  { value: "1", label: "Marco García - (Cabeza de familia)" },
-  { value: "2", label: "Ana García - (Cónyuge)" },
-];
+// const miembrosMock = [
+//   { value: "1", label: "Marco García - (Cabeza de familia)" },
+//   { value: "2", label: "Ana García - (Cónyuge)" },
+// ];
 
-const riesgosMock = [
-  { value: "1", label: "Inundación - vivienda a orillas de la quebrada" },
-  { value: "2", label: "Caída de árboles rocas - descripcion" },
-];
+// const riesgosMock = [
+//   { value: "1", label: "Inundación - vivienda a orillas de la quebrada" },
+//   { value: "2", label: "Caída de árboles rocas - descripcion" },
+// ];
 
-const tiposAccion = [
-  { value: "1", label: "Antes" },
-  { value: "2", label: "Durante" },
-  { value: "3", label: "Despues" },
-];
+// const tiposAccion = [
+//   { value: "1", label: "Antes" },
+//   { value: "2", label: "Durante" },
+//   { value: "3", label: "Despues" },
+// ];
 
 export const PlanAccionView = () => {
   const { planId } = useParams();
@@ -38,39 +39,155 @@ export const PlanAccionView = () => {
   const [nuevaAccion, setNuevaAccion] = useState({ member_id: "", description: "" });
   const [errorAccion, setErrorAccion] = useState("");
 
-  const handleGuardarPlan = () => {
-    if (!liderId || !riesgoId) return;
+  const [miembros, setMiembros] = useState([]);
+  const [riesgos, setRiesgos] = useState([]);
+  const [tiposAccion, setTiposAccion] = useState([]);
+  const [actionPlanId, setActionPlanId] = useState(null); // id del plan en la base de datos
+  const [loading, setLoading] = useState(true);
+  const [guardando, setGuardando] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertVariant, setAlertVariant] = useState("success");
 
-    // Mock: acá iría el POST real /actionPlans { member_id: liderId, risk_factor_id: riesgoId }
-    setPlanCreado(true);
+  const mostrarAlerta = (variant, message) => {
+    setAlertVariant(variant);
+    setAlertMessage(message);
+    setShowToast(true);
   };
 
-  const handleGuardarAccion = () => {
+  useEffect(() => {
+    // Un 404 solo significa que todavía no hay registros; cualquier otro error sí se propaga
+    const ignorar404 = (error) => {
+      if (error?.code !== 404) throw error;
+      return null;
+    };
+  
+    const cargarDatos = async () => {
+      try {
+        const [miembrosData, riesgosData, tiposData, plan] = await Promise.all([
+          api.get(`members/familyPlan/${planId}`).catch(ignorar404),
+          api.get(`riskFactors/familyPlan/select/${planId}`).catch(ignorar404),
+          api.get("actionTypes"),
+          api.get(`actionPlans/familyPlan/${planId}`).catch(ignorar404),
+        ]);
+  
+        setMiembros(
+          (miembrosData || []).map((m) => ({
+            value: String(m.id),
+            label: `${m.full_name} - (${m.kinship})`,
+          }))
+        );
+  
+        setRiesgos(
+          (riesgosData || []).map((r) => ({
+            value: String(r.id),
+            label: `${r.threat_type_name} - ${r.description}`,
+          }))
+        );
+  
+        const listaTipos = (tiposData || []).map((t) => ({ value: String(t.id), label: t.name }));
+        setTiposAccion(listaTipos);
+        if (listaTipos.length) setTabActiva(listaTipos[0].value);
+  
+        // Si el plan de acción ya existe, se restaura el estado y se cargan sus acciones
+        if (plan) {
+          setActionPlanId(plan.id);
+          setLiderId(String(plan.member_id));
+          setRiesgoId(String(plan.risk_factor_id));
+          setPlanCreado(true);
+  
+          const accionesData = await api.get(`actionPlanActions/actionPlan/${plan.id}`);
+          setAcciones(accionesData || []);
+        }
+      } catch (error) {
+        console.error("Error al cargar el plan de acción:", error.details ?? error);
+        mostrarAlerta("error", "No se pudo cargar el plan de acción.");
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    cargarDatos();
+  }, [planId]);
+  
+  if (loading) {
+    return <p className="text-(--color_azul)">Cargando plan de acción...</p>;
+  }
+
+  const handleGuardarPlan = async () => {
+    if (!liderId || !riesgoId) {
+      mostrarAlerta("error", "Selecciona un miembro y un factor de riesgo.");
+      return;
+    }
+  
+    setGuardando(true);
+  
+    try {
+      const payload = { member_id: liderId, risk_factor_id: riesgoId };
+  
+      if (actionPlanId) {
+        await api.put(`actionPlans/${actionPlanId}`, payload);
+      } else {
+        const respuesta = await api.post("actionPlans", payload);
+        setActionPlanId(respuesta?.id ?? respuesta?.data?.id ?? null);
+      }
+  
+      setPlanCreado(true);
+      mostrarAlerta("success", "Plan de acción guardado con éxito.");
+
+    } catch (error) {
+
+      console.error("Error al guardar el plan de acción:", error.details ?? error);
+      mostrarAlerta("error", "No se pudo guardar el plan de acción.");
+
+    } finally {
+
+      setGuardando(false);
+    }
+  };
+
+  const handleGuardarAccion = async () => {
     if (!nuevaAccion.member_id || !nuevaAccion.description.trim()) {
       setErrorAccion("Selecciona un integrante y escribe la acción a realizar");
       return;
     }
-
-    const miembro = miembrosMock.find((m) => m.value === nuevaAccion.member_id);
-
-    // Mock: acá iría el POST real /actionPlanActions { action_type_id: tabActiva, member_id, description, action_plan_id }
-    setAcciones((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
+  
+    setGuardando(true);
+  
+    try {
+      const respuesta = await api.post("actionPlanActions", {
+        action_plan_id: actionPlanId,
         action_type_id: tabActiva,
         member_id: nuevaAccion.member_id,
-        member_name: miembro?.label.split(" - ")[0] ?? "Integrante",
         description: nuevaAccion.description.trim(),
-      },
-    ]);
-
-    setNuevaAccion({ member_id: "", description: "" });
-    setErrorAccion("");
-    setFormAccion(false);
+      });
+  
+      const creada = respuesta?.data ?? respuesta;
+      const miembro = miembros.find((m) => m.value === nuevaAccion.member_id);
+  
+      setAcciones((prev) => [
+        ...prev,
+        {
+          id: creada?.id ?? `tmp-${Date.now()}`,
+          action_type_id: tabActiva,
+          member_id: nuevaAccion.member_id,
+          member_name: miembro?.label.split(" - ")[0] ?? "Integrante",
+          description: nuevaAccion.description.trim(),
+        },
+      ]);
+  
+      setNuevaAccion({ member_id: "", description: "" });
+      setErrorAccion("");
+      setFormAccion(false);
+    } catch (error) {
+      console.error("Error al guardar la acción:", error.details ?? error);
+      mostrarAlerta("error", "No se pudo guardar la acción.");
+    } finally {
+      setGuardando(false);
+    }
   };
 
-  const accionesDeLaFase = acciones.filter((a) => a.action_type_id === tabActiva);
+  const accionesDeLaFase = acciones.filter((a) => String(a.action_type_id) === tabActiva);
 
   return (
     <div className="w-full flex flex-col gap-6">
@@ -88,7 +205,7 @@ export const PlanAccionView = () => {
           placeholder="Seleccione un miembro..."
           value={liderId}
           onChange={(e) => setLiderId(e.target.value)}
-          arrayOptions={miembrosMock}
+          arrayOptions={miembros}
         />
 
         <Select
@@ -96,12 +213,12 @@ export const PlanAccionView = () => {
           placeholder="Seleccione un factor de riesgo..."
           value={riesgoId}
           onChange={(e) => setRiesgoId(e.target.value)}
-          arrayOptions={riesgosMock}
+          arrayOptions={riesgos}
         />
 
         <div className="w-full flex justify-center">
-          <Button variant="accent" onClick={handleGuardarPlan}>
-            Guardar
+         <Button variant="accent" onClick={handleGuardarPlan} isLoading={guardando}>
+            {actionPlanId ? "Actualizar" : "Guardar"}
           </Button>
         </div>
       </Card>
@@ -136,7 +253,7 @@ export const PlanAccionView = () => {
 
             <Button
               type="button"
-              variant="outline"
+              variant="outline-primary"
               size="sm"
               onClick={() => setFormAccion((prev) => !prev)}
             >
@@ -152,7 +269,7 @@ export const PlanAccionView = () => {
                 placeholder="Seleccione un miembro"
                 value={nuevaAccion.member_id}
                 onChange={(e) => setNuevaAccion((prev) => ({ ...prev, member_id: e.target.value }))}
-                arrayOptions={miembrosMock}
+                arrayOptions={miembros}
               />
 
               <Textarea
@@ -162,7 +279,7 @@ export const PlanAccionView = () => {
                 error={errorAccion}
               />
 
-              <Button type="button" variant="accent" onClick={handleGuardarAccion}>
+              <Button type="button" variant="accent" onClick={handleGuardarAccion} isLoading={guardando}>
                 Guardar acción
               </Button>
             </div>
@@ -189,6 +306,14 @@ export const PlanAccionView = () => {
           </div>
         </Card>
       )}
+
+      <Alert
+        variant={alertVariant}
+        text={alertMessage}
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+      />
+
     </div>
   );
 };
